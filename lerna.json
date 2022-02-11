@@ -1,4 +1,6 @@
 {
   "packages": ["packages/*"],
-  "version": "independent"
+  "version": "independent",
+  "workspaces": ["packages/*"],
+  "useWorkspaces": true
 }

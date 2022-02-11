@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        /* Basic Optios */
+        "target": "ES6" /* Specify EcmaScript target version */,
+        "module": "commonjs" /* Specify module code generation: none, commonjs, amd,system, umd, es2015, es2020, ESNext */,
+        "lib": ["ESNext", "DOM"] /* Library files to be included in the compitaion */,
+        "allowJs": true /* Allow JS files to be compiled */,
+        "outDir": "dist/",
+        "rootDir": "src/",
+        "removeComments": true,
+        /* Strict type checking options */
+        "strict": true,
+        "noImplicitAny": true,
+        /* Module resolution options */
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@/": ["src/*"]
+        },
+        "esModuleInterop": true,
+        /* Experimental options */
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        /* Advanced option */
+        "skipLibCheck": true /* Skip type checking of declaration files */,
+        "forceConsistentCasingInFileNames": true /* Disallow inconsistently cased references to the same file */
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist", "__tests__", "coverage"]
+}

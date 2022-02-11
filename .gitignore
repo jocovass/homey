@@ -1,6 +1,9 @@
 node_modules
+dist
+.env
 .vscode
 .husky/_
 .serverless
 .build
 lerna-debug.log
+notes.md

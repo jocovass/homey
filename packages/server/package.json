@@ -1,11 +1,35 @@
 {
-  "name": "homie-node-server",
-  "version": "1.0.0",
-  "description": "NodeJS backend for homie application.",
-  "main": "index.js",
-  "author": "Jozsef Vass",
-  "license": "MIT",
-  "scripts": {
-    "precommit": "echo precommit running in server dir 🤖"
-  }
+    "name": "homie-node-server",
+    "version": "1.0.0",
+    "description": "NodeJS backend for homie application.",
+    "main": "index.js",
+    "author": "Jozsef Vass",
+    "license": "MIT",
+    "scripts": {
+        "precommit": "echo precommit running in server dir 🤖",
+        "start": "nodemon ./src/index.ts",
+        "build": "tsc --project ."
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.13",
+        "@types/node": "^17.0.17",
+        "@typescript-eslint/eslint-plugin": "^5.11.0",
+        "@typescript-eslint/parser": "^5.11.0",
+        "eslint": "^8.8.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-airbnb-typescript": "^16.1.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-eslint-comments": "^3.2.0",
+        "eslint-plugin-import": "^2.25.4",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-promise": "^6.0.0",
+        "nodemon": "^2.0.15",
+        "prettier": "^2.5.1",
+        "ts-node": "^10.5.0",
+        "typescript": "^4.5.5"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.0",
+        "express": "^4.17.2"
+    }
 }
