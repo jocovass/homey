@@ -1,0 +1,11 @@
+{
+  "name": "homie-node-server",
+  "version": "1.0.0",
+  "description": "NodeJS backend for homie application.",
+  "main": "index.js",
+  "author": "Jozsef Vass",
+  "license": "MIT",
+  "scripts": {
+    "precommit": "echo precommit running in server dir 🤖"
+  }
+}
