@@ -1,47 +1,17 @@
 {
+    "extends": "../../tsconfig.settings.json",
     "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "lib": ["dom", "esnext", "esnext.asynciterable"],
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-
-        "composite": true,
-        "declaration": true,
-        "declarationMap": true,
-        "sourceMap": true,
-
-        "allowJs": true,
-        "allowUnreachableCode": false,
-        "forceConsistentCasingInFileNames": true,
-        "isolatedModules": false,
-        "jsx": "react-jsx",
-
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "pretty": true,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-
-        "strict": true,
-
-        "outDir": "dist",
-        "rootDir": ".",
-        "removeComments": true,
-        "noImplicitAny": true,
-        "baseUrl": ".",
-        "paths": {
-            "@/": ["src/*"]
-        },
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "outDir": "dist/",
+        "rootDir": "."
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
     "exclude": ["node_modules"],
     "references": [
         {
             "path": "../server"
+        },
+        {
+            "path": "../common"
         }
     ]
 }

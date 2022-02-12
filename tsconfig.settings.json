@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    /* Specify EcmaScript target version */
+    "target": "ES6",
+    /* Specify module code generation: none, commonjs, amd,system, umd, es2015, es2020, ESNext */
+    "module": "commonjs",
+    /* Library files to be included in the compitaion */
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    /* Allow JS files to be compiled */
+    "allowJs": true,
+    "removeComments": true,
+    /* Strict type checking options */
+    "strict": true,
+    "noImplicitAny": true,
+    /* Module resolution options */
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    /* Experimental options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    /* Skip type checking of declaration files */
+    "skipLibCheck": true,
+    /* Disallow inconsistently cased references to the same file */
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "isolatedModules": false,
+    "jsx": "react-jsx",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "pretty": true,
+    "resolveJsonModule": true
+  }
+}

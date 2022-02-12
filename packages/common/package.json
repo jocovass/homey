@@ -1,0 +1,12 @@
+{
+  "name": "@homie/common",
+  "version": "1.0.0",
+  "description": "Shared data and types for the project.",
+  "main": "index.js",
+  "author": "Jozsef Vass",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  }
+}
