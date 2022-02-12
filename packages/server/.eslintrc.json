@@ -5,8 +5,7 @@
         "jest": true
     },
     "extends": [
-        "airbnb-base",
-        "airbnb-typescript/base",
+        "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:eslint-comments/recommended",
         "plugin:jest/recommended",
@@ -15,7 +14,8 @@
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "./tsconfig.eslint.json"
+        "ecmaVersion": 2018,
+        "sourceType": "module"
     },
     "plugins": ["@typescript-eslint", "eslint-comments", "promise", "import", "prettier"],
     "rules": {

@@ -1,10 +1,15 @@
 {
     "compilerOptions": {
         /* Basic Optios */
-        "target": "ES6" /* Specify EcmaScript target version */,
-        "module": "commonjs" /* Specify module code generation: none, commonjs, amd,system, umd, es2015, es2020, ESNext */,
-        "lib": ["ESNext", "DOM"] /* Library files to be included in the compitaion */,
-        "allowJs": true /* Allow JS files to be compiled */,
+        /* ========================= */
+        /* Specify EcmaScript target version */
+        "target": "ES6",
+        /* Specify module code generation: none, commonjs, amd,system, umd, es2015, es2020, ESNext */
+        "module": "commonjs",
+        /* Library files to be included in the compitaion */
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        /* Allow JS files to be compiled */
+        "allowJs": true,
         "outDir": "dist/",
         "rootDir": "src/",
         "removeComments": true,
@@ -17,14 +22,36 @@
         "paths": {
             "@/": ["src/*"]
         },
+        // "noEmit": true,
         "esModuleInterop": true,
         /* Experimental options */
+        /* ========================= */
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         /* Advanced option */
-        "skipLibCheck": true /* Skip type checking of declaration files */,
-        "forceConsistentCasingInFileNames": true /* Disallow inconsistently cased references to the same file */
+        /* ========================= */
+        /* Skip type checking of declaration files */
+        "skipLibCheck": true,
+        /* Disallow inconsistently cased references to the same file */
+        "forceConsistentCasingInFileNames": true,
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+
+        "allowUnreachableCode": false,
+        "isolatedModules": false,
+        "jsx": "react-jsx",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "pretty": true,
+        "resolveJsonModule": true
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "dist", "__tests__", "coverage"]
+    "exclude": ["node_modules", "dist", "__tests__", "coverage"],
+    "references": [
+        {
+            "path": "../web"
+        }
+    ]
 }
