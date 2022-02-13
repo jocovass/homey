@@ -2,15 +2,16 @@
     "name": "@homie/server",
     "version": "1.0.0",
     "description": "NodeJS backend for homie application.",
-    "main": "dist/index.js",
+    "main": "dist/server.js",
     "author": "Jozsef Vass",
     "license": "MIT",
     "scripts": {
         "precommit": "echo precommit running in server dir 🤖",
-        "start": "nodemon ./src/index.ts",
+        "start": "nodemon ./src/server.ts",
         "build": "tsc --project ."
     },
     "devDependencies": {
+        "@types/cors": "^2.8.12",
         "@types/express": "^4.17.13",
         "@types/node": "^17.0.17",
         "@typescript-eslint/eslint-plugin": "^5.11.0",
@@ -27,7 +28,18 @@
         "typescript": "^4.5.5"
     },
     "dependencies": {
+        "bcrypt": "^5.0.1",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
         "dotenv": "^16.0.0",
-        "express": "^4.17.2"
+        "express": "^4.17.2",
+        "express-mongo-sanitize": "^2.2.0",
+        "express-rate-limit": "^6.2.1",
+        "helmet": "^5.0.2",
+        "hpp": "^0.2.3",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^6.2.1",
+        "morgan": "^1.10.0",
+        "xss-clean": "^0.1.1"
     }
 }

@@ -17,7 +17,13 @@
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint", "eslint-comments", "promise", "import", "prettier"],
+    "plugins": [
+        "@typescript-eslint",
+        "eslint-comments",
+        "promise",
+        "import",
+        "prettier"
+    ],
     "rules": {
         "prettier/prettier": "error",
         "import/prefer-default-export": "off",
@@ -40,7 +46,19 @@
                 "typedefs": true
             }
         ],
-        "import/no-extraneous-dependencies": "off"
+        "import/no-extraneous-dependencies": "off",
+        "no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "req|res|next|val|err"
+            }
+        ],
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "req|res|next|val|err"
+            }
+        ]
     },
     "settings": {
         "import/resolver": {
