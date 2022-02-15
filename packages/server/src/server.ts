@@ -8,13 +8,13 @@ const DB_URL = process.env.DB;
 if (DB_URL) {
     mongoose
         .connect(DB_URL)
-        .then(() => console.log(`DB connection successful ✅`))
+        .then(() => console.log(`✅ DB connection successful`))
         .catch(error => {
-            console.log(`DB connection failed 💥`);
+            console.log(`💥 DB connection failed`);
             console.log(error);
         });
 }
 
 app.listen(PORT, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
+    console.log(`⚡️ [server]: Server is running at http://localhost:${PORT}`);
 });

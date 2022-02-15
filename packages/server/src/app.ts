@@ -1,4 +1,9 @@
-import express from 'express';
+import express, {
+    ErrorRequestHandler,
+    Request,
+    Response,
+    NextFunction,
+} from 'express';
 import cors from 'cors';
 
 import { userRouter } from './routes/userRoutes';
@@ -14,8 +19,22 @@ app.use(express.json());
 app.use('/api/v1/users', userRouter);
 
 // Catch any unhandled routes
-app.all('*', (req, res, next) => {
-    res.status(404).json({ message: `The requested URL doen't exist.` });
+app.all('*', (req: Request, res: Response, next: NextFunction) => {
+    return next({
+        statusCode: 404,
+        message: "The requested URL doesn't existsSync.",
+    });
 });
+
+// Global error handler
+const globalErrorHandle: ErrorRequestHandler = (err, req, res, next) => {
+    const { statusCode, message } = err;
+    res.status(statusCode || 500).json({
+        error: {
+            message: message || 'Something went wrong.',
+        },
+    });
+};
+app.use(globalErrorHandle);
 
 export { app };
