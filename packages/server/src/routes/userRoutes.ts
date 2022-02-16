@@ -1,5 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { User, IUserFront } from '../models/userModel';
+import jwt from 'jsonwebtoken';
+import { Types } from 'mongoose';
+import { IUserBack, User } from '../models/userModel';
 
 // create a subrouter on /api/v1/users
 const router = express.Router();
@@ -11,13 +13,43 @@ type SignupProps = {
     password: string;
 };
 
-// lgoin
 // logout
 // updateprofile
 // updateimage
-// singup
 // signupwithinvitation
 // resetpassword
+
+const signToken = (id: Types.ObjectId) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'TEST', {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+};
+
+type CreateSendToken = (
+    user: IUserBack,
+    statusCode: number,
+    req: Request,
+    res: Response,
+) => void;
+
+const COOKIE_EXPIRES = Number(process.env.JWT_COOKIE_EXPIRES_IN) || 90;
+const createSendToken: CreateSendToken = (user, statusCode, req, res) => {
+    const token = signToken(user._id);
+
+    res.cookie('jwt', token, {
+        expires: new Date(Date.now() + COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+        httpOnly: true,
+    });
+
+    (user.password as any) = undefined;
+
+    res.status(statusCode).json({
+        message: 'Authentication was successfull',
+        token,
+        data: user,
+    });
+};
 
 router.post(
     '/signup',
@@ -26,20 +58,14 @@ router.post(
             const { firstName, lastName, email, password }: SignupProps =
                 req.body;
 
-            const user: IUserFront & { password: string | undefined } =
-                await User.create({
-                    email,
-                    firstName,
-                    lastName,
-                    password,
-                });
-
-            user.password = undefined;
-
-            res.status(201).json({
-                message: 'Successfull. User account was created.',
-                data: user,
+            const user = await User.create({
+                email,
+                firstName,
+                lastName,
+                password,
             });
+
+            createSendToken(user, 201, req, res);
         } catch (error) {
             console.log(error);
             res.status(400).json({ message: 'Bad request' });
@@ -53,23 +79,20 @@ router.post(
         try {
             const { email, password }: { email: string; password: string } =
                 req.body;
-            const user: IUserFront | null = await User.findOne({ email });
+            const user = await User.findOne({ email });
 
-            if (!user) {
+            if (!user || !(await user.comparePassword(password))) {
                 return next({
                     statusCode: 401,
-                    message: 'Unauhtorized.',
+                    message: 'Email or password is not correct.',
                 });
             }
 
-            return res.status(200).json({
-                message: 'Login was successful.',
-                data: user,
-            });
-        } catch (error) {
+            createSendToken(user, 200, req, res);
+        } catch (error: any) {
             return next({
-                statusCode: 401,
-                message: 'Unauhtorized.',
+                statusCode: 500,
+                message: error?.message || 'Something went wrong',
             });
         }
     },

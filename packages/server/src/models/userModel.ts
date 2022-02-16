@@ -29,8 +29,9 @@ export interface IUserFront extends IUserBase {
     _id: Types.ObjectId;
 }
 
-interface IUserBack extends IUserBase, Document {
+export interface IUserBack extends IUserBase, Document {
     password: string;
+    _id: Types.ObjectId;
     comparePassword: (password: string) => Promise<boolean>;
 }
 
@@ -57,7 +58,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
         },
         password: {
             type: String,
-            select: false,
+            select: true,
             required: [true, 'Password is required.'],
         },
         houehold: {
@@ -98,27 +99,16 @@ userSchema.pre<IUserBack>('save', async function (next): Promise<void> {
     if (!this.isModified('password')) {
         return next();
     }
-
     this.password = await bcrypt.hash(this.password, 12);
 });
 
 userSchema.method<IUserBack>(
     'comparePassword',
-    function (password: string): boolean {
-        if (bcrypt.compareSync(password, this.password)) return true;
-        return false;
+    function (password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
     },
 );
 
 const User = model<IUserBack, UserModel>('User', userSchema);
-
-async function run() {
-    const u = await User.findOne({});
-    if (u) {
-        u.comparePassword('pass');
-    }
-}
-
-run();
 
 export { User };
