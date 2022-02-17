@@ -1,10 +1,16 @@
 import express, { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import { IUserBack, User } from '../models/userModel';
 
 // create a subrouter on /api/v1/users
 const router = express.Router();
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: IUserBack;
+    }
+}
 
 type SignupProps = {
     firstName: string;
@@ -19,8 +25,9 @@ type SignupProps = {
 // signupwithinvitation
 // resetpassword
 
+const SECRET = process.env.JWT_SECRET || 'TEST';
 const signToken = (id: Types.ObjectId) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'TEST', {
+    return sign({ id }, SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN,
     });
 };
@@ -93,6 +100,78 @@ router.post(
             return next({
                 statusCode: 500,
                 message: error?.message || 'Something went wrong',
+            });
+        }
+    },
+);
+
+interface TokenPayload extends JwtPayload {
+    id: Types.ObjectId;
+}
+
+const validateToken = (token: string): Promise<TokenPayload> => {
+    return new Promise((resolve, reject) => {
+        verify(token, SECRET, (error, decoded) => {
+            if (error) return reject(error);
+
+            resolve(decoded as TokenPayload);
+        });
+    });
+};
+
+router.use(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        let token: string | undefined;
+        const { authorization } = req.headers;
+        if (authorization && authorization.startsWith('Bearer')) {
+            token = authorization.split(' ')[1];
+        } else if (req.cookies.jwt) {
+            token = req.cookies.jwt;
+        }
+
+        if (!token) {
+            return next({
+                statusCode: 401,
+                message: 'Unauhtorized! Please log in to get access.',
+            });
+        }
+
+        const decoded: TokenPayload = await validateToken(token);
+
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return next({
+                statusCode: 401,
+                message: 'The token is invalid or expired.',
+            });
+        }
+
+        req.user = user;
+        next();
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
+
+router.post(
+    '/updateProfile',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // need to get the token from the cookie
+            // decode the cooike check if it is valid expired/id has user in DB
+            // if true perform the update if not reject de request
+            res.status(200).json({
+                message: 'successful implemented jwt',
+                user: req.user,
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: 'errrrrrrr',
             });
         }
     },
