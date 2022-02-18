@@ -164,7 +164,7 @@ interface UpdateProfile {
     password?: string;
 }
 router.post(
-    '/updateProfile',
+    '/update_profile',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email, firstName, lastName, password }: UpdateProfile =
@@ -200,6 +200,35 @@ router.post(
         }
     },
 );
+
+router.post('/update_password', async (req, res, next) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        const user = req.user;
+
+        // check if the user password matches the given currentPassword
+        if (!(await user?.comparePassword(currentPassword))) {
+            return next({
+                statusCode: 404,
+                message: "The password doesn't match users password.",
+            });
+        }
+
+        if (user) {
+            user.password = newPassword;
+            user.save();
+        }
+
+        return res.status(200).json({
+            message: 'Password updated successfully.',
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
 
 router.post('/logout', (req, res, next) => {
     try {
