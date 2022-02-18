@@ -6,6 +6,7 @@ import { IUserBack, User } from '../models/userModel';
 // create a subrouter on /api/v1/users
 const router = express.Router();
 
+// TODO: validation middleware
 declare module 'express-serve-static-core' {
     interface Request {
         user?: IUserBack;
@@ -20,7 +21,6 @@ type SignupProps = {
 };
 
 // logout
-// updateprofile
 // updateimage
 // signupwithinvitation
 // resetpassword
@@ -157,24 +157,66 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
+interface UpdateProfile {
+    email?: string;
+    firstName?: string;
+    lastName: string;
+    password?: string;
+}
 router.post(
     '/updateProfile',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // need to get the token from the cookie
-            // decode the cooike check if it is valid expired/id has user in DB
-            // if true perform the update if not reject de request
+            const { email, firstName, lastName, password }: UpdateProfile =
+                req.body;
+
+            if (password) {
+                return next({
+                    statusCode: 404,
+                    message:
+                        'To update the password please use the /updatePassword endpoint.',
+                });
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user?._id,
+                {
+                    email,
+                    firstName,
+                    lastName,
+                },
+                { new: true },
+            );
+
             res.status(200).json({
-                message: 'successful implemented jwt',
-                user: req.user,
+                message: 'User updated successfully.',
+                user: updatedUser,
             });
         } catch (error: any) {
             return next({
                 statusCode: 500,
-                message: 'errrrrrrr',
+                message: error.message,
             });
         }
     },
 );
+
+router.post('/logout', (req, res, next) => {
+    try {
+        res.cookie('jwt', 'loggedout', {
+            expires: new Date(Date.now() + 1000),
+            httpOnly: true,
+        });
+
+        return res.status(200).json({
+            message: 'Logged out successfully.',
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
 
 export { router as userRouter };
