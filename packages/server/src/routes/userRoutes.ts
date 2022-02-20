@@ -1,7 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { Types } from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import { IUserBack, User } from '../models/userModel';
+import { uploadAvatar } from '../config/cloudinary';
 
 // create a subrouter on /api/v1/users
 const router = express.Router();
@@ -10,6 +12,7 @@ const router = express.Router();
 declare module 'express-serve-static-core' {
     interface Request {
         user?: IUserBack;
+        file?: Express.Multer.File;
     }
 }
 
@@ -20,10 +23,8 @@ type SignupProps = {
     password: string;
 };
 
-// logout
-// updateimage
 // signupwithinvitation
-// resetpassword
+// forgotmypassword
 
 const SECRET = process.env.JWT_SECRET || 'TEST';
 const signToken = (id: Types.ObjectId) => {
@@ -119,6 +120,7 @@ const validateToken = (token: string): Promise<TokenPayload> => {
     });
 };
 
+// isAuthenticated middleware
 router.use(async (req: Request, res: Response, next: NextFunction) => {
     try {
         let token: string | undefined;
@@ -201,9 +203,60 @@ router.post(
     },
 );
 
+router.post('/update_profile_image', uploadAvatar(), (req, res, next) => {
+    try {
+        const { file, user } = req;
+
+        if (!file) {
+            return next({
+                statusCode: 404,
+                message: 'Avatar is missing, did you forget to select an img?',
+            });
+        }
+
+        // check if the user already has avtar cus we want to delete that
+        if (user) {
+            const prevAvatar = user.avatar;
+
+            user.avatar = file.filename;
+            user.save();
+
+            if (prevAvatar) {
+                // need to delete the old avatar so we don't have too many image in storage
+                cloudinary.uploader.destroy(
+                    prevAvatar,
+                    { invalidate: true },
+                    (error, result) => {
+                        if (error) {
+                            console.log(
+                                `💥 Error while deleting avatar from cloudinary`,
+                                error,
+                            );
+                        } else if (result) {
+                            console.log(
+                                `✅ Avatar successfully deleted from cloudinary`,
+                                result,
+                            );
+                        }
+                    },
+                );
+            }
+
+            return res.status(200).json({
+                data: file,
+            });
+        }
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
+
 router.post('/update_password', async (req, res, next) => {
     try {
-        const { currentPassword, newPassword, confirmPassword } = req.body;
+        const { currentPassword, newPassword } = req.body;
         const user = req.user;
 
         // check if the user password matches the given currentPassword
@@ -249,3 +302,8 @@ router.post('/logout', (req, res, next) => {
 });
 
 export { router as userRouter };
+
+// TODO: some references for later to go through
+// Could storage: https://cloud.google.com/storage/docs/how-to
+// Nodejs streams: https://www.freecodecamp.org/news/node-js-streams-everything-you-need-to-know-c9141306be93/
+// Cloud storage Nodejs client: https://googleapis.dev/nodejs/storage/latest/

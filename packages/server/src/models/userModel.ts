@@ -20,7 +20,7 @@ interface IUserBase {
     firstName: string;
     lastName: string;
     email: string;
-    photo?: string;
+    avatar?: string;
     invitation?: IUserInvitation;
     houehold?: IUserHousehold;
 }
@@ -53,7 +53,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
             lowercase: true,
             required: [true, 'Email is required.'],
         },
-        photo: {
+        avatar: {
             type: String,
         },
         password: {
