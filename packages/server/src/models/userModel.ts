@@ -1,5 +1,6 @@
 import { Schema, Model, Types, model, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 interface IUserInvitation {
     _id?: Types.ObjectId;
@@ -31,8 +32,11 @@ export interface IUserFront extends IUserBase {
 
 export interface IUserBack extends IUserBase, Document {
     password: string;
+    passwordResetToken?: string;
+    passwordResetExpires?: DataView;
     _id: Types.ObjectId;
     comparePassword: (password: string) => Promise<boolean>;
+    createPasswordResetToken: () => string;
 }
 
 type UserModel = Model<IUserBack>;
@@ -87,6 +91,8 @@ const userSchema = new Schema<IUserBack, UserModel>(
                 ref: 'Household',
             },
         },
+        passwordResetToken: String,
+        passwordResetExpires: Date,
     },
     {
         timestamps: true,
@@ -108,6 +114,18 @@ userSchema.method<IUserBack>(
         return bcrypt.compare(password, this.password);
     },
 );
+
+userSchema.methods.createPasswordResetToken = function (): string {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    this.passwordResetToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
+};
 
 const User = model<IUserBack, UserModel>('User', userSchema);
 

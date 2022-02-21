@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
 import { IUserBack, User } from '../models/userModel';
 import { uploadAvatar } from '../config/cloudinary';
+import { sendPasswordResetEmail } from '../services/email';
 
 // create a subrouter on /api/v1/users
 const router = express.Router();
@@ -80,6 +81,55 @@ router.post(
         }
     },
 );
+
+router.post('/forget_my_password', async (req, res, next) => {
+    try {
+        const { email }: { email: string } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return next({
+                statusCode: 400,
+                message: `There is no user with this email address ${email}`,
+            });
+        }
+        req.user = user;
+
+        const resetToken = user.createPasswordResetToken();
+        await user.save({ validateBeforeSave: false });
+
+        const resetURL = `${req.protocol}://${req.get(
+            'host',
+        )}/api/v1/user/reset_password/${resetToken}`;
+        await sendPasswordResetEmail({
+            emailTo: email,
+            resetURL,
+        });
+
+        return res.status(200).json({
+            message: 'Password reset email is sent.',
+        });
+    } catch (error: any) {
+        try {
+            const { user } = req;
+
+            if (user) {
+                user.passwordResetToken = undefined;
+                user.passwordResetExpires = undefined;
+                await user?.save({ validateBeforeSave: false });
+            }
+
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    }
+});
 
 router.post(
     '/login',
