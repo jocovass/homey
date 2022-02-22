@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
@@ -25,7 +26,6 @@ type SignupProps = {
 };
 
 // signupwithinvitation
-// forgotmypassword
 
 const SECRET = process.env.JWT_SECRET || 'TEST';
 const signToken = (id: Types.ObjectId) => {
@@ -99,7 +99,7 @@ router.post('/forget_my_password', async (req, res, next) => {
 
         const resetURL = `${req.protocol}://${req.get(
             'host',
-        )}/api/v1/user/reset_password/${resetToken}`;
+        )}/api/v1/users/reset_password/${resetToken}`;
         await sendPasswordResetEmail({
             emailTo: email,
             resetURL,
@@ -128,6 +128,43 @@ router.post('/forget_my_password', async (req, res, next) => {
                 message: error.message,
             });
         }
+    }
+});
+
+router.post('/reset_password/:resetToken', async (req, res, next) => {
+    try {
+        const { resetToken }: { resetToken: string } = req.params;
+        const { password }: { password: string } = req.body;
+
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+        const user = await User.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return next({
+                statusCode: 400,
+                message: 'Refresh token is expired or invalid.',
+            });
+        }
+
+        user.password = password;
+        user.passwordResetExpires = undefined;
+        user.passwordResetToken = undefined;
+        user.save();
+
+        return res.status(200).json({
+            message: 'Password was updated successfully.',
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
     }
 });
 
