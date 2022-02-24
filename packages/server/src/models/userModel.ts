@@ -18,6 +18,7 @@ interface IUserHousehold {
 }
 
 interface IUserBase {
+    _id: Types.ObjectId;
     firstName: string;
     lastName: string;
     email: string;
@@ -127,6 +128,4 @@ userSchema.methods.createPasswordResetToken = function (): string {
     return resetToken;
 };
 
-const User = model<IUserBack, UserModel>('User', userSchema);
-
-export { User };
+export const User = model<IUserBack, UserModel>('User', userSchema);
