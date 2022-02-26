@@ -174,28 +174,14 @@ router.post(
         try {
             const { email, password }: { email: string; password: string } =
                 req.body;
-            const user = await User.findOne({ email }).populate({
-                path: 'household',
-                populate: {
-                    path: 'householdRef',
-                    populate: {
-                        path: 'householdRef',
-                        select: 'name',
-                    },
-                },
-            });
-
-            // {
-            //     path: "followers",
-            //     populate: {
-            //       path: "followers",
-            //       select: "_id avatar firstName lastName"
-            //     }
-            //   }
+            const user = await User.findOne({ email }).select('+password');
 
             console.log(user);
 
-            if (!user || !(await user.comparePassword(password))) {
+            if (
+                !user ||
+                !(await user.comparePassword(user.password, password))
+            ) {
                 return next({
                     statusCode: 401,
                     message: 'Email or password is not correct.',
@@ -369,10 +355,13 @@ router.post('/update_profile_image', uploadAvatar(), (req, res, next) => {
 router.post('/update_password', async (req, res, next) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        const user = req.user;
+        const user = await User.findById(req.user?._id).select('+password');
 
         // check if the user password matches the given currentPassword
-        if (!(await user?.comparePassword(currentPassword))) {
+        if (
+            user &&
+            !(await user?.comparePassword(user.password, currentPassword))
+        ) {
             return next({
                 statusCode: 404,
                 message: "The password doesn't match users password.",

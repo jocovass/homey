@@ -1,27 +1,26 @@
 import { Router } from 'express';
-// import { Types } from 'mongoose';
-import { Homey } from '../models/homeyModel';
+import { Household } from '../models/householdModel';
 import { authMiddelware } from './userRoutes';
 
-export const homeyRouter = Router();
+export const householdRouter = Router();
 
-homeyRouter.use(authMiddelware);
+householdRouter.use(authMiddelware);
 
-homeyRouter.post('/create', async (req, res, next) => {
+householdRouter.post('/create', async (req, res, next) => {
     try {
         const { name }: { name: string } = req.body;
         // req.user should have the current user data
         const currentUser = req.user;
         if (currentUser) {
             console.log(currentUser.household);
-            if (currentUser.household) {
+            if (currentUser.household?.householdRef) {
                 return next({
                     statusCode: 400,
                     message: 'A user can be member one household at a time.',
                 });
             }
             // try to create the household if the name is used throw reject the request
-            const household = await Homey.create({
+            const household = await Household.create({
                 name,
                 members: [currentUser._id],
             });
@@ -44,6 +43,27 @@ homeyRouter.post('/create', async (req, res, next) => {
         return next({
             statusCode: 500,
             error: error.message,
+        });
+    }
+});
+
+householdRouter.get('/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const household = await Household.findById(id).populate({
+            path: 'members',
+            match: { _id: { $ne: req.user?._id } },
+        });
+
+        return res.status(200).json({
+            data: {
+                household,
+            },
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
         });
     }
 });

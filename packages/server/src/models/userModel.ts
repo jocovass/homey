@@ -35,7 +35,10 @@ export interface IUserBack extends IUserBase, Document {
     passwordResetToken?: string;
     passwordResetExpires?: DataView;
     _id: Types.ObjectId;
-    comparePassword: (password: string) => Promise<boolean>;
+    comparePassword: (
+        currentPassword: string,
+        candidatePassword: string,
+    ) => Promise<boolean>;
     createPasswordResetToken: () => string;
 }
 
@@ -62,7 +65,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
         },
         password: {
             type: String,
-            select: true,
+            select: false,
             required: [true, 'Password is required.'],
         },
         household: {
@@ -73,7 +76,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
             joined: Date,
             householdRef: {
                 type: Schema.Types.ObjectId,
-                ref: 'Homey',
+                ref: 'Household',
             },
         },
         invitation: {
@@ -110,8 +113,11 @@ userSchema.pre<IUserBack>('save', async function (next): Promise<void> {
 
 userSchema.method<IUserBack>(
     'comparePassword',
-    function (password: string): Promise<boolean> {
-        return bcrypt.compare(password, this.password);
+    function (
+        currentPassword: string,
+        candidatePassword: string,
+    ): Promise<boolean> {
+        return bcrypt.compare(candidatePassword, currentPassword);
     },
 );
 
