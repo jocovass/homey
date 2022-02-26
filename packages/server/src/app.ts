@@ -8,6 +8,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import { userRouter } from './routes/userRoutes';
+import { homeyRouter } from './routes/homeyRoutes';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
 
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/households', homeyRouter);
 
 // Catch any unhandled routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {

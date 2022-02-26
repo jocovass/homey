@@ -174,7 +174,26 @@ router.post(
         try {
             const { email, password }: { email: string; password: string } =
                 req.body;
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email }).populate({
+                path: 'household',
+                populate: {
+                    path: 'householdRef',
+                    populate: {
+                        path: 'householdRef',
+                        select: 'name',
+                    },
+                },
+            });
+
+            // {
+            //     path: "followers",
+            //     populate: {
+            //       path: "followers",
+            //       select: "_id avatar firstName lastName"
+            //     }
+            //   }
+
+            console.log(user);
 
             if (!user || !(await user.comparePassword(password))) {
                 return next({
@@ -207,8 +226,11 @@ const validateToken = (token: string): Promise<TokenPayload> => {
     });
 };
 
-// isAuthenticated middleware
-router.use(async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddelware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
     try {
         let token: string | undefined;
         const { authorization } = req.headers;
@@ -244,7 +266,10 @@ router.use(async (req: Request, res: Response, next: NextFunction) => {
             message: error.message,
         });
     }
-});
+};
+
+// isAuthenticated middleware
+router.use(authMiddelware);
 
 interface UpdateProfile {
     email?: string;

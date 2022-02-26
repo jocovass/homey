@@ -11,8 +11,7 @@ interface IUserInvitation {
 }
 
 interface IUserHousehold {
-    _id: Types.ObjectId;
-    household: Types.ObjectId;
+    householdRef: Types.ObjectId;
     joined: Date;
     role: 'member' | 'admin' | 'owner';
 }
@@ -24,7 +23,7 @@ interface IUserBase {
     email: string;
     avatar?: string;
     invitation?: IUserInvitation;
-    houehold?: IUserHousehold;
+    household?: IUserHousehold | null;
 }
 
 export interface IUserFront extends IUserBase {
@@ -66,7 +65,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
             select: true,
             required: [true, 'Password is required.'],
         },
-        houehold: {
+        household: {
             role: {
                 type: String,
                 enum: ['admin', 'member', 'owner'],
@@ -74,7 +73,7 @@ const userSchema = new Schema<IUserBack, UserModel>(
             joined: Date,
             householdRef: {
                 type: Schema.Types.ObjectId,
-                ref: 'Household',
+                ref: 'Homey',
             },
         },
         invitation: {
