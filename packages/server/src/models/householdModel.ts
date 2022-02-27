@@ -1,10 +1,10 @@
 import { Schema, Types, model } from 'mongoose';
 
-interface ShoppingListItem {
+export interface ShoppingListItem {
     label: string;
     amount: number;
     unit: string;
-    status: 'pending' | 'done';
+    status?: 'pending' | 'done';
 }
 
 interface IHousehold {
@@ -45,6 +45,7 @@ const householdSchema = new Schema<IHousehold>(
                         status: {
                             type: String,
                             enum: ['done', 'pending'],
+                            default: 'pending',
                         },
                     },
                 ],

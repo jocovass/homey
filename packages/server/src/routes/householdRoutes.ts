@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Household } from '../models/householdModel';
 import { authMiddelware } from './userRoutes';
+import { ShoppingListItem } from '../models/householdModel';
 
 export const householdRouter = Router();
 
@@ -12,7 +13,6 @@ householdRouter.post('/create', async (req, res, next) => {
         // req.user should have the current user data
         const currentUser = req.user;
         if (currentUser) {
-            console.log(currentUser.household);
             if (currentUser.household?.householdRef) {
                 return next({
                     statusCode: 400,
@@ -67,3 +67,131 @@ householdRouter.get('/:id', async (req, res, next) => {
         });
     }
 });
+
+householdRouter.post(
+    '/:householdId/shoppinglist/create',
+    async (req, res, next) => {
+        try {
+            const { title } = req.body;
+            const { householdId } = req.params;
+            const household = await Household.findByIdAndUpdate(
+                householdId,
+                { $push: { shoppingList: { title } } },
+                {
+                    new: true,
+                },
+            );
+            return res.status(201).json({
+                data: {
+                    household,
+                },
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
+
+householdRouter.post(
+    '/:householdId/shoppinglist/:shoppinglistId/add',
+    async (req, res, next) => {
+        try {
+            const { label, amount, unit }: ShoppingListItem = req.body;
+            const { householdId, shoppinglistId } = req.params;
+            const household = await Household.findOneAndUpdate(
+                {
+                    _id: householdId,
+                    shoppingList: { $elemMatch: { _id: shoppinglistId } },
+                },
+                {
+                    $push: {
+                        'shoppingList.$.list': {
+                            label,
+                            amount,
+                            unit,
+                        },
+                    },
+                },
+                {
+                    new: true,
+                },
+            );
+
+            return res.status(201).json({
+                data: {
+                    household,
+                },
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
+
+householdRouter.delete(
+    '/:householdId/shoppinglist/:shoppinglistId/remove/:listId',
+    async (req, res, next) => {
+        try {
+            const { householdId, shoppinglistId, listId } = req.params;
+            const household = await Household.findOneAndUpdate(
+                {
+                    _id: householdId,
+                    shoppingList: { $elemMatch: { _id: shoppinglistId } },
+                },
+                {
+                    $pull: {
+                        'shoppingList.$.list': {
+                            _id: listId,
+                        },
+                    },
+                },
+                {
+                    new: true,
+                },
+            );
+
+            return res.status(204).json({
+                data: {
+                    household,
+                },
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
+
+householdRouter.delete(
+    '/:householdId/shoppinglist/:shoppinglistId',
+    async (req, res, next) => {
+        try {
+            const { householdId, shoppinglistId } = req.params;
+            const household = await Household.findByIdAndUpdate(
+                householdId,
+                { $pull: { shoppingList: { _id: shoppinglistId } } },
+                {
+                    new: true,
+                },
+            );
+            return res.status(204).json({
+                data: {
+                    household,
+                },
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
