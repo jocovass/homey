@@ -103,6 +103,20 @@ recepieRouter.post('/create', async (req, res, next) => {
     }
 });
 
+recepieRouter.delete('/delete', async (req, res, next) => {
+    try {
+        const { recepieId } = req.body;
+        await Recepie.findByIdAndDelete(recepieId);
+
+        return res.status(204).json({});
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
+
 recepieRouter.post('/update_popular_recepies', async (req, res, next) => {
     try {
         const { householdId }: { householdId: Types.ObjectId } = req.body;
