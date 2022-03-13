@@ -144,7 +144,7 @@ recipeRouter.patch('/update/:recipeId', async (req, res, next) => {
 recipeRouter.patch('/update_cooked/:recipeId', async (req, res, next) => {
     try {
         const { recipeId } = req.params;
-        const { coocked }: { coocked: number } = req.body;
+        const { cooked }: { cooked: number } = req.body;
 
         if (!recipeId) {
             return next({
@@ -156,7 +156,7 @@ recipeRouter.patch('/update_cooked/:recipeId', async (req, res, next) => {
         const result = await Recipe.findByIdAndUpdate(
             recipeId,
             {
-                coocked,
+                cooked,
             },
             { new: true },
         );
@@ -195,7 +195,7 @@ recipeRouter.post('/update_popular_recipes', async (req, res, next) => {
 
         queries.push(
             Recipe.find({ householdRef: householdId })
-                .sort('-coocked')
+                .sort('-cooked')
                 .limit(2)
                 .exec(),
         );
@@ -225,8 +225,8 @@ recipeRouter.post('/update_popular_recipes', async (req, res, next) => {
                         popularRecipes.push(recipes.shift());
                         household.recipes.mostPopular.shift();
                     } else if (
-                        recipes[0].coocked >=
-                        household.recipes.mostPopular[0].coocked
+                        recipes[0].cooked >=
+                        household.recipes.mostPopular[0].cooked
                     ) {
                         popularRecipes.push(recipes.shift());
                     } else {

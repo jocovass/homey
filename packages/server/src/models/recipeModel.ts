@@ -12,7 +12,7 @@ export interface IRecipe {
     createdBy: string;
     ingredients: IIngredient[];
     url: string;
-    coocked?: number;
+    cooked?: number;
     photo?: string;
     instructions?: {
         text: string;
@@ -32,7 +32,7 @@ const recipeSchema = new Schema<IRecipe>(
         photo: String,
         tags: [String],
         createdBy: String,
-        coocked: {
+        cooked: {
             type: Number,
             default: 0,
         },
