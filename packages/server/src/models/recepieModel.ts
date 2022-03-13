@@ -14,7 +14,10 @@ export interface IRecepie {
     url: string;
     coocked?: number;
     photo?: string;
-    instructions?: string;
+    instructions?: {
+        text: string;
+        nodeType: string;
+    }[];
     note?: string;
     tags?: string[];
 }
@@ -35,7 +38,12 @@ const recepieSchema = new Schema<IRecepie>(
         },
         note: String,
         url: String,
-        instructions: String,
+        instructions: [
+            {
+                text: String,
+                nodeType: String,
+            },
+        ],
         ingredients: [
             {
                 label: String,

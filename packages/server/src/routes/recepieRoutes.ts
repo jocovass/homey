@@ -12,7 +12,6 @@ interface CreateRecepeie extends IRecepie {
     householdId: Types.ObjectId;
 }
 
-// deleteRecepie
 // update
 
 interface GetRecepiesQueryPS {
@@ -103,9 +102,48 @@ recepieRouter.post('/create', async (req, res, next) => {
     }
 });
 
-recepieRouter.delete('/delete', async (req, res, next) => {
+recepieRouter.patch('/update/:recepieId', async (req, res, next) => {
     try {
-        const { recepieId } = req.body;
+        const { title, tags, ingredients, url, instructions, note }: IRecepie =
+            req.body;
+        const { recepieId } = req.params;
+
+        if (!recepieId) {
+            return next({
+                statusCode: 400,
+                message: 'Must provide recepieId',
+            });
+        }
+
+        const result = await Recepie.findByIdAndUpdate(
+            recepieId,
+            {
+                title,
+                url,
+                note,
+                tags,
+                ingredients,
+                instructions,
+            },
+            {
+                new: true,
+            },
+        );
+
+        return res.status(200).json({
+            data: result,
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
+
+recepieRouter.delete('/delete/:recepieId', async (req, res, next) => {
+    try {
+        const { recepieId } = req.params;
         await Recepie.findByIdAndDelete(recepieId);
 
         return res.status(204).json({});
@@ -180,29 +218,3 @@ recepieRouter.post('/update_popular_recepies', async (req, res, next) => {
         });
     }
 });
-
-// Schema.findOneAndUpdate(
-//     { _id: _id },
-//     [{
-//       $set: {
-//         subColl: {
-//           $cond: [
-//             { $in: [update.name, "$subColl.name"] },
-//             {
-//               $map: {
-//                 input: "$subColl",
-//                 in: {
-//                   $cond: [
-//                     { $eq: ["$$this.name", update.name] },
-//                     { $mergeObjects: ["$$this", update] },
-//                     "$$this"
-//                   ]
-//                 }
-//               }
-//             },
-//             { $concatArrays: ["$subColl", [update]] }
-//           ]
-//         }
-//       }
-//     }]
-//   )
