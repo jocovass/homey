@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { Types } from 'mongoose';
 import { Household } from '../models/householdModel';
 import { Recepie, IRecepie } from '../models/recepieModel';
@@ -12,9 +12,66 @@ interface CreateRecepeie extends IRecepie {
     householdId: Types.ObjectId;
 }
 
-// getAll
 // deleteRecepie
 // update
+
+interface GetRecepiesQueryPS {
+    page?: number;
+    perPage?: number;
+    tags?: string;
+    search?: string;
+}
+
+recepieRouter.get(
+    '/',
+    async (
+        req: Request<
+            undefined,
+            { data: { recepies: IRecepie[] } },
+            { householdId: Types.ObjectId },
+            GetRecepiesQueryPS
+        >,
+        res,
+        next,
+    ) => {
+        try {
+            const { householdId } = req.body;
+            const { page = 1, perPage = 20, tags, search } = req.query;
+
+            if (!householdId) {
+                return next({
+                    statusCode: 400,
+                    message: 'Must provide householdId.',
+                });
+            }
+
+            const filters: {
+                tags?: { $in: string[] };
+                $text?: { $search: string };
+            } = {};
+            if (tags) filters.tags = { $in: [...tags.split(',')] };
+            if (search) filters['$text'] = { $search: search };
+
+            const results = await Recepie.find({
+                householdRef: householdId,
+                ...filters,
+            })
+                .skip(perPage * (page - 1))
+                .limit(perPage);
+
+            return res.status(200).json({
+                data: {
+                    recepies: results,
+                },
+            });
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
 
 recepieRouter.post('/create', async (req, res, next) => {
     try {

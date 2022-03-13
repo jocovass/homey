@@ -47,4 +47,6 @@ const recepieSchema = new Schema<IRecepie>(
     { timestamps: true },
 );
 
+recepieSchema.index({ '$**': 'text' });
+
 export const Recepie = model<IRecepie>('Recepie', recepieSchema);
