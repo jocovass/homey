@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 
 import { userRouter } from './routes/userRoutes';
 import { householdRouter } from './routes/householdRoutes';
-import { recepieRouter } from './routes/recepieRoutes';
+import { recipeRouter } from './routes/recipeRoutes';
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/households', householdRouter);
-app.use('/api/v1/recepies', recepieRouter);
+app.use('/api/v1/recipes', recipeRouter);
 
 // Catch any unhandled routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {

@@ -1,34 +1,34 @@
 import { Router, Request } from 'express';
 import { Types } from 'mongoose';
 import { Household } from '../models/householdModel';
-import { Recepie, IRecepie } from '../models/recepieModel';
+import { Recipe, IRecipe } from '../models/recipeModel';
 import { authMiddelware } from './userRoutes';
 
-export const recepieRouter = Router();
+export const recipeRouter = Router();
 
-recepieRouter.use(authMiddelware);
+recipeRouter.use(authMiddelware);
 
-interface CreateRecepeie extends IRecepie {
+interface CreateRecipe extends IRecipe {
     householdId: Types.ObjectId;
 }
 
 // update
 
-interface GetRecepiesQueryPS {
+interface GetRecipesQueryPS {
     page?: number;
     perPage?: number;
     tags?: string;
     search?: string;
 }
 
-recepieRouter.get(
+recipeRouter.get(
     '/',
     async (
         req: Request<
             undefined,
-            { data: { recepies: IRecepie[] } },
+            { data: { recipes: IRecipe[] } },
             { householdId: Types.ObjectId },
-            GetRecepiesQueryPS
+            GetRecipesQueryPS
         >,
         res,
         next,
@@ -51,7 +51,7 @@ recepieRouter.get(
             if (tags) filters.tags = { $in: [...tags.split(',')] };
             if (search) filters['$text'] = { $search: search };
 
-            const results = await Recepie.find({
+            const results = await Recipe.find({
                 householdRef: householdId,
                 ...filters,
             })
@@ -60,7 +60,7 @@ recepieRouter.get(
 
             return res.status(200).json({
                 data: {
-                    recepies: results,
+                    recipes: results,
                 },
             });
         } catch (error: any) {
@@ -72,10 +72,10 @@ recepieRouter.get(
     },
 );
 
-recepieRouter.post('/create', async (req, res, next) => {
+recipeRouter.post('/create', async (req, res, next) => {
     try {
-        const { householdId, ...rest }: CreateRecepeie = req.body;
-        const recepie = await Recepie.create({
+        const { householdId, ...rest }: CreateRecipe = req.body;
+        const recipe = await Recipe.create({
             ...rest,
             householdRef: householdId,
         });
@@ -83,14 +83,14 @@ recepieRouter.post('/create', async (req, res, next) => {
         const household = await Household.findByIdAndUpdate(
             householdId,
             {
-                $inc: { 'recepies.total': 1 },
+                $inc: { 'recipes.total': 1 },
             },
             { new: true },
         );
 
         return res.status(201).json({
             data: {
-                recepie,
+                recipe,
                 household,
             },
         });
@@ -102,21 +102,21 @@ recepieRouter.post('/create', async (req, res, next) => {
     }
 });
 
-recepieRouter.patch('/update/:recepieId', async (req, res, next) => {
+recipeRouter.patch('/update/:recipeId', async (req, res, next) => {
     try {
-        const { title, tags, ingredients, url, instructions, note }: IRecepie =
+        const { title, tags, ingredients, url, instructions, note }: IRecipe =
             req.body;
-        const { recepieId } = req.params;
+        const { recipeId } = req.params;
 
-        if (!recepieId) {
+        if (!recipeId) {
             return next({
                 statusCode: 400,
-                message: 'Must provide recepieId',
+                message: 'Must provide recipeId',
             });
         }
 
-        const result = await Recepie.findByIdAndUpdate(
-            recepieId,
+        const result = await Recipe.findByIdAndUpdate(
+            recipeId,
             {
                 title,
                 url,
@@ -141,10 +141,43 @@ recepieRouter.patch('/update/:recepieId', async (req, res, next) => {
     }
 });
 
-recepieRouter.delete('/delete/:recepieId', async (req, res, next) => {
+recipeRouter.patch('/update_cooked/:recipeId', async (req, res, next) => {
     try {
-        const { recepieId } = req.params;
-        await Recepie.findByIdAndDelete(recepieId);
+        const { recipeId } = req.params;
+        const { coocked }: { coocked: number } = req.body;
+
+        if (!recipeId) {
+            return next({
+                statusCode: 400,
+                message: 'Must provide recipeId',
+            });
+        }
+
+        const result = await Recipe.findByIdAndUpdate(
+            recipeId,
+            {
+                coocked,
+            },
+            { new: true },
+        );
+
+        return res.status(200).json({
+            data: {
+                recipe: result,
+            },
+        });
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
+
+recipeRouter.delete('/delete/:recipeId', async (req, res, next) => {
+    try {
+        const { recipeId } = req.params;
+        await Recipe.findByIdAndDelete(recipeId);
 
         return res.status(204).json({});
     } catch (error: any) {
@@ -155,58 +188,62 @@ recepieRouter.delete('/delete/:recepieId', async (req, res, next) => {
     }
 });
 
-recepieRouter.post('/update_popular_recepies', async (req, res, next) => {
+recipeRouter.post('/update_popular_recipes', async (req, res, next) => {
     try {
         const { householdId }: { householdId: Types.ObjectId } = req.body;
         const queries: any[] = [];
 
         queries.push(
-            Recepie.find({ householdRef: householdId })
+            Recipe.find({ householdRef: householdId })
                 .sort('-coocked')
                 .limit(2)
                 .exec(),
         );
 
         queries.push(
-            Household.findById(householdId).populate('recepies.latest').exec(),
+            Household.findById(householdId)
+                .populate('recipes.mostPopular')
+                .exec(),
         );
 
-        const [recepies, household] = await Promise.all(queries);
+        const [recipes, household] = await Promise.all(queries);
 
-        // if we have recepies we want to update the two most popular recepies in the
+        // if we have recipes we want to update the two most popular recipes in the
         // household document
-        if (Array.isArray(recepies) && recepies.length) {
-            const popularRecepies = [];
-            if (household.recepies.latest.length) {
+        if (Array.isArray(recipes) && recipes.length) {
+            const popularRecipes = [];
+            if (household.recipes.mostPopular.length) {
                 while (
-                    recepies.length &&
-                    household.recepies.latest.length &&
-                    popularRecepies.length < 2
+                    recipes.length &&
+                    household.recipes.mostPopular.length &&
+                    popularRecipes.length < 2
                 ) {
                     if (
-                        String(recepies[0]._id) ===
-                        String(household.recepies.latest[0]._id)
+                        String(recipes[0]._id) ===
+                        String(household.recipes.mostPopular[0]._id)
                     ) {
-                        popularRecepies.push(recepies.shift());
-                        household.recepies.latest.shift();
+                        popularRecipes.push(recipes.shift());
+                        household.recipes.mostPopular.shift();
                     } else if (
-                        recepies[0].coocked >=
-                        household.recepies.latest[0].coocked
+                        recipes[0].coocked >=
+                        household.recipes.mostPopular[0].coocked
                     ) {
-                        popularRecepies.push(recepies.shift());
+                        popularRecipes.push(recipes.shift());
                     } else {
-                        popularRecepies.push(household.recepies.latest.shift());
+                        popularRecipes.push(
+                            household.recipes.mostPopular.shift(),
+                        );
                     }
                 }
 
-                if (popularRecepies.length < 2 && recepies.length) {
-                    popularRecepies.push(...recepies);
+                if (popularRecipes.length < 2 && recipes.length) {
+                    popularRecipes.push(...recipes);
                 }
             } else {
-                popularRecepies.push(...recepies);
+                popularRecipes.push(...recipes);
             }
 
-            household.recepies.latest = popularRecepies;
+            household.recipes.mostPopular = popularRecipes;
             await household.save();
         }
 

@@ -16,9 +16,9 @@ interface IHousehold {
         },
     ];
     members: [{ type: Types.ObjectId; ref: string }];
-    recepies: {
+    recipes: {
         totla: number;
-        latest: [{ type: Types.ObjectId; ref: string }];
+        mostPopular: [{ type: Types.ObjectId; ref: string }];
     };
     finances: {
         total?: number;
@@ -57,12 +57,12 @@ const householdSchema = new Schema<IHousehold>(
                 ref: 'User',
             },
         ],
-        recepies: {
+        recipes: {
             total: {
                 type: Number,
                 default: 0,
             },
-            latest: [{ type: Schema.Types.ObjectId, ref: 'Recepie' }],
+            mostPopular: [{ type: Schema.Types.ObjectId, ref: 'Recipe' }],
         },
         finances: {
             total: {

@@ -16,7 +16,7 @@ householdRouter.post('/create', async (req, res, next) => {
             if (currentUser.household?.householdRef) {
                 return next({
                     statusCode: 400,
-                    message: 'A user can be member one household at a time.',
+                    message: 'A user can be member of one household at a time.',
                 });
             }
             // try to create the household if the name is used throw reject the request

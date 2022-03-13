@@ -6,7 +6,7 @@ export interface IIngredient {
     unit: string;
 }
 
-export interface IRecepie {
+export interface IRecipe {
     title: string;
     householdRef: Types.ObjectId;
     createdBy: string;
@@ -22,7 +22,7 @@ export interface IRecepie {
     tags?: string[];
 }
 
-const recepieSchema = new Schema<IRecepie>(
+const recipeSchema = new Schema<IRecipe>(
     {
         title: String,
         householdRef: {
@@ -55,6 +55,6 @@ const recepieSchema = new Schema<IRecepie>(
     { timestamps: true },
 );
 
-recepieSchema.index({ '$**': 'text' });
+recipeSchema.index({ '$**': 'text' });
 
-export const Recepie = model<IRecepie>('Recepie', recepieSchema);
+export const Recipe = model<IRecipe>('Recipe', recipeSchema);
