@@ -1,10 +1,9 @@
 import { Router, Request } from 'express';
 import { Types } from 'mongoose';
-import { v2 as cloudinary } from 'cloudinary';
 import { Household } from '../models/householdModel';
 import { Recipe, IRecipe } from '../models/recipeModel';
 import { authMiddelware } from './userRoutes';
-import { uploadRecipePhoto } from '../config/cloudinary';
+import { uploadRecipePhoto, deletePhoto } from '../config/cloudinary';
 
 export const recipeRouter = Router();
 
@@ -13,8 +12,6 @@ recipeRouter.use(authMiddelware);
 interface CreateRecipe extends IRecipe {
     householdId: Types.ObjectId;
 }
-
-// update
 
 interface GetRecipesQueryPS {
     page?: number;
@@ -199,23 +196,7 @@ recipeRouter.patch(
                 await recipe.save();
 
                 if (prevPhoto) {
-                    cloudinary.uploader.destroy(
-                        prevPhoto,
-                        { invalidate: true },
-                        (error, result) => {
-                            if (error) {
-                                console.log(
-                                    `💥 Error while deleting recipe photo from cloudinary`,
-                                    error,
-                                );
-                            } else if (result) {
-                                console.log(
-                                    `✅ Recipe photo successfully deleted from cloudinary`,
-                                    result,
-                                );
-                            }
-                        },
-                    );
+                    deletePhoto(prevPhoto);
                 }
 
                 return res.status(200).json({
@@ -232,6 +213,25 @@ recipeRouter.patch(
         }
     },
 );
+
+recipeRouter.delete('/:recipeId/delete_photo', async (req, res, next) => {
+    try {
+        const { recipeId } = req.params;
+        const { filename } = req.body;
+
+        await deletePhoto(filename);
+        await Recipe.findByIdAndUpdate(recipeId, {
+            photo: undefined,
+        });
+
+        return res.status(204).json({});
+    } catch (error: any) {
+        return next({
+            statusCode: 500,
+            message: error.message,
+        });
+    }
+});
 
 recipeRouter.delete('/:recipeId/delete', async (req, res, next) => {
     try {

@@ -21,6 +21,30 @@ export const uploadAvatar = () => {
     }).single('avatar');
 };
 
+export const deletePhoto = (filename: string) => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.destroy(
+            filename,
+            { invalidate: true },
+            (error, result) => {
+                if (error) {
+                    console.log(
+                        `💥 Error while deleting recipe photo from cloudinary`,
+                        error,
+                    );
+                    return reject(error);
+                } else if (result) {
+                    console.log(
+                        `✅ Recipe photo successfully deleted from cloudinary`,
+                        result,
+                    );
+                    return resolve(result);
+                }
+            },
+        );
+    });
+};
+
 export const uploadRecipePhoto = () => {
     const storage = new CSEngine({
         cloudinary,
