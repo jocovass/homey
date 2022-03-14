@@ -1,8 +1,10 @@
 import { Router, Request } from 'express';
 import { Types } from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import { Household } from '../models/householdModel';
 import { Recipe, IRecipe } from '../models/recipeModel';
 import { authMiddelware } from './userRoutes';
+import { uploadRecipePhoto } from '../config/cloudinary';
 
 export const recipeRouter = Router();
 
@@ -141,7 +143,7 @@ recipeRouter.patch('/update/:recipeId', async (req, res, next) => {
     }
 });
 
-recipeRouter.patch('/update_cooked/:recipeId', async (req, res, next) => {
+recipeRouter.patch('/:recipeId/update_cooked', async (req, res, next) => {
     try {
         const { recipeId } = req.params;
         const { cooked }: { cooked: number } = req.body;
@@ -174,7 +176,64 @@ recipeRouter.patch('/update_cooked/:recipeId', async (req, res, next) => {
     }
 });
 
-recipeRouter.delete('/delete/:recipeId', async (req, res, next) => {
+recipeRouter.patch(
+    '/:recipeId/update_photo',
+    uploadRecipePhoto(),
+    async (req, res, next) => {
+        try {
+            const { file } = req;
+            const { recipeId } = req.params;
+
+            if (!file || !recipeId) {
+                return next({
+                    statusCode: 404,
+                    message: 'Photo and recipeId must be provided.',
+                });
+            }
+
+            const recipe = await Recipe.findById(recipeId);
+            if (recipe) {
+                const prevPhoto = recipe.photo;
+
+                recipe.photo = file.filename;
+                await recipe.save();
+
+                if (prevPhoto) {
+                    cloudinary.uploader.destroy(
+                        prevPhoto,
+                        { invalidate: true },
+                        (error, result) => {
+                            if (error) {
+                                console.log(
+                                    `💥 Error while deleting recipe photo from cloudinary`,
+                                    error,
+                                );
+                            } else if (result) {
+                                console.log(
+                                    `✅ Recipe photo successfully deleted from cloudinary`,
+                                    result,
+                                );
+                            }
+                        },
+                    );
+                }
+
+                return res.status(200).json({
+                    data: {
+                        recipe,
+                    },
+                });
+            }
+        } catch (error: any) {
+            return next({
+                statusCode: 500,
+                message: error.message,
+            });
+        }
+    },
+);
+
+recipeRouter.delete('/:recipeId/delete', async (req, res, next) => {
     try {
         const { recipeId } = req.params;
         await Recipe.findByIdAndDelete(recipeId);

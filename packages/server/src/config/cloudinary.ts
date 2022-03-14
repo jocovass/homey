@@ -21,4 +21,17 @@ export const uploadAvatar = () => {
     }).single('avatar');
 };
 
+export const uploadRecipePhoto = () => {
+    const storage = new CSEngine({
+        cloudinary,
+        options: {
+            upload_preset: 'recipes',
+        },
+    });
+
+    return multer({
+        storage,
+    }).single('photo');
+};
+
 export { cloudinary };
