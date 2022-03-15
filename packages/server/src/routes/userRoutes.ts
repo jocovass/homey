@@ -6,6 +6,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { IUserBack, User } from '../models/userModel';
 import { uploadAvatar } from '../config/cloudinary';
 import { sendPasswordResetEmail } from '../services/email';
+import { singup } from '../controllers/authControlles';
 
 // create a subrouter on /api/v1/users
 const router = express.Router();
@@ -18,12 +19,12 @@ declare module 'express-serve-static-core' {
     }
 }
 
-type SignupProps = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-};
+// type SignupProps = {
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//     password: string;
+// };
 
 // signupwithinvitation
 
@@ -60,27 +61,7 @@ const createSendToken: CreateSendToken = (user, statusCode, req, res) => {
     });
 };
 
-router.post(
-    '/signup',
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { firstName, lastName, email, password }: SignupProps =
-                req.body;
-
-            const user = await User.create({
-                email,
-                firstName,
-                lastName,
-                password,
-            });
-
-            createSendToken(user, 201, req, res);
-        } catch (error) {
-            console.log(error);
-            res.status(400).json({ message: 'Bad request' });
-        }
-    },
-);
+router.post('/signup', singup);
 
 router.post('/forget_my_password', async (req, res, next) => {
     try {
