@@ -2,7 +2,7 @@ import { Router, Request } from 'express';
 import { Types } from 'mongoose';
 import { Household } from '../models/householdModel';
 import { Recipe, IRecipe } from '../models/recipeModel';
-import { authMiddelware } from './userRoutes';
+import { authMiddelware } from '../controllers/authControlles';
 import { uploadRecipePhoto, deletePhoto } from '../config/cloudinary';
 
 export const recipeRouter = Router();
