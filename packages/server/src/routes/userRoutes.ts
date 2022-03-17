@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadAvatar } from '../config/cloudinary';
+import { singlePhoto } from '../services/cloudinary';
 import {
     singup,
     login,
@@ -27,7 +27,11 @@ router.post('/reset_password/:resetToken', resetPassword);
 router.use(authMiddelware);
 
 router.post('/update_profile', updateProfile);
-router.post('/update_profile_image', uploadAvatar(), updateProfileImage);
+router.post(
+    '/update_profile_image',
+    singlePhoto('users_profile', 'avatar'),
+    updateProfileImage,
+);
 router.post('/update_password', updatePassword);
 router.post('/logout', logout);
 

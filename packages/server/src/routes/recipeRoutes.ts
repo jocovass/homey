@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authMiddelware } from '../controllers/authControlles';
-import { uploadRecipePhoto } from '../config/cloudinary';
+import { singlePhoto } from '../services/cloudinary';
 import {
     createRecipe,
     deleteRecipe,
@@ -22,7 +22,7 @@ recipeRouter.patch('/update/:recipeId', updateRecipe);
 recipeRouter.patch('/:recipeId/update_cooked', updateRecipeCooked);
 recipeRouter.patch(
     '/:recipeId/update_photo',
-    uploadRecipePhoto(),
+    singlePhoto('recipes', 'photo'),
     updateRecipePhoto,
 );
 recipeRouter.delete('/:recipeId/delete_photo', deleteRecipePhoto);

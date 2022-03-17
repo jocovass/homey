@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 import { Household } from '../models/householdModel';
 import { Recipe, IRecipe } from '../models/recipeModel';
-import { deletePhoto } from '../config/cloudinary';
+import { deletePhoto } from '../services/cloudinary';
 import { catchAsync } from '../utils/catchAsync';
 import { AppError } from '../utils/appError';
 

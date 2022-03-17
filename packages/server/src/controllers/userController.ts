@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/userModel';
 import { AppError } from '../utils/appError';
 import { catchAsync } from '../utils/catchAsync';
-import { deletePhoto } from '../config/cloudinary';
+import { deletePhoto } from '../services/cloudinary';
 
 interface UpdateProfile {
     email?: string;

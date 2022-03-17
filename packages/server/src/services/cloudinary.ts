@@ -8,17 +8,17 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SCRET,
 });
 
-export const uploadAvatar = () => {
+export const singlePhoto = (uploadPreset: string, fieldName: string) => {
     const storage = new CSEngine({
         cloudinary,
         options: {
-            upload_preset: 'users_profile',
+            upload_preset: uploadPreset,
         },
     });
 
     return multer({
         storage,
-    }).single('avatar');
+    }).single(fieldName);
 };
 
 export const deletePhoto = (filename: string) => {
@@ -43,19 +43,6 @@ export const deletePhoto = (filename: string) => {
             },
         );
     });
-};
-
-export const uploadRecipePhoto = () => {
-    const storage = new CSEngine({
-        cloudinary,
-        options: {
-            upload_preset: 'recipes',
-        },
-    });
-
-    return multer({
-        storage,
-    }).single('photo');
 };
 
 export { cloudinary };
