@@ -1,15 +1,12 @@
-import express, {
-    ErrorRequestHandler,
-    Request,
-    Response,
-    NextFunction,
-} from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import { userRouter } from './routes/userRoutes';
 import { householdRouter } from './routes/householdRoutes';
 import { recipeRouter } from './routes/recipeRoutes';
+import { errorController } from './controllers/errorController';
+import { AppError } from './utils/appError';
 
 const app = express();
 
@@ -28,21 +25,12 @@ app.use('/api/v1/recipes', recipeRouter);
 
 // Catch any unhandled routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
-    return next({
-        statusCode: 404,
-        message: "The requested URL doesn't existsSync.",
-    });
+    return next(
+        new AppError(`${req.originalUrl} endpoint doesn't exists.`, 400),
+    );
 });
 
 // Global error handler
-const globalErrorHandle: ErrorRequestHandler = (err, req, res, next) => {
-    const { statusCode, message } = err;
-    res.status(statusCode || 500).json({
-        error: {
-            message: message || 'Something went wrong.',
-        },
-    });
-};
-app.use(globalErrorHandle);
+app.use(errorController);
 
 export { app };
