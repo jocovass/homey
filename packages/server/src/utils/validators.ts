@@ -1,23 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, validationResult, ValidationChain } from 'express-validator';
+import { body, validationResult, param } from 'express-validator';
 
 /////////////////////////////////////
 // Rules
-type Rules = { [k: string]: ValidationChain };
-const rules: Rules = {
-    firstName: body('firstName')
+export const simpleField = (fieldName: string | string[]) =>
+    body(fieldName)
         .trim()
         .not()
         .isEmpty()
         .withMessage('Field is required')
-        .escape(),
-    lastName: body('lastName')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage('Field is required')
-        .escape(),
-    email: body('email')
+        .escape();
+
+export const email = (fieldName = 'email') =>
+    body(fieldName)
         .trim()
         .not()
         .isEmpty()
@@ -25,66 +20,43 @@ const rules: Rules = {
         .escape()
         .isEmail()
         .withMessage('Invalid email address')
-        .normalizeEmail({ gmail_remove_dots: false, gmail_lowercase: true }),
-    password: body('password')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage('Field is required.')
-        .escape(),
-    // .isStrongPassword()
-    // .withMessage('Password is weak.'),
-    newPassword: body('newPassword')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage('Field is required.')
-        .escape(),
-    // .isStrongPassword()
-    // .withMessage('Password is weak.'),
-    passwordConfirm: body('passwordConfirm')
-        .trim()
-        .not()
-        .isEmpty()
-        .withMessage('Field is required.')
-        .escape()
-        .custom((val, { req }) => {
-            if (val !== req.body.password)
-                throw new Error(
-                    'Password confirmation does not match password.',
-                );
+        .normalizeEmail({ gmail_remove_dots: false, gmail_lowercase: true });
 
-            return true;
-        }),
-    newPasswordConfirm: body('newPasswordConfirm')
+export const password = (fieldName: string | string[] = 'password') =>
+    body(fieldName)
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage('Field is required.')
+        .escape();
+// .isStrongPassword()
+// .withMessage('Password is weak.'),
+
+export const comparePassword = (
+    fieldName = 'password',
+    compareTo = 'passwordConfirm',
+) =>
+    body(fieldName)
         .trim()
         .not()
         .isEmpty()
         .withMessage('Field is required.')
         .escape()
         .custom((val, { req }) => {
-            if (val !== req.body.newPassword)
+            if (val !== req.body[compareTo])
                 throw new Error(
                     'Password confirmation does not match password.',
                 );
 
             return true;
-        }),
-};
+        });
 
-/////////////////////////////////////
-// Generate rules based on the inserted fields
-export const generateRules = (...fields: string[]) => {
-    if (!fields.length) return [];
-
-    const validators = [];
-
-    for (const field of fields) {
-        validators.push(rules[field]);
-    }
-
-    return validators;
-};
+export const checkParams = (paramName: string | string[]) =>
+    param(paramName)
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage(`${paramName} is required, did you forget?`);
 
 /////////////////////////////////////
 // If there is a validation error send it to the client

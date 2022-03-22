@@ -45,9 +45,13 @@ export const createHousehold = catchAsync(
 );
 
 export const getHousehold = catchAsync(
-    async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-        const { id } = req.params;
-        const household = await Household.findById(id).populate({
+    async (
+        req: Request<{ householdId: string }>,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const { householdId } = req.params;
+        const household = await Household.findById(householdId).populate({
             path: 'members',
             match: { _id: { $ne: req.user?._id } },
         });

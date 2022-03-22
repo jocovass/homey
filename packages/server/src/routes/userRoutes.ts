@@ -13,7 +13,13 @@ import {
     updateProfile,
     updateProfileImage,
 } from '../controllers/userController';
-import { validate, generateRules } from '../utils/validators';
+import {
+    validate,
+    simpleField,
+    email,
+    password,
+    comparePassword,
+} from '../utils/validators';
 
 const router = express.Router();
 
@@ -22,36 +28,24 @@ const router = express.Router();
 
 router.post(
     '/signup',
-    generateRules(
-        'firstName',
-        'lastName',
-        'email',
-        'password',
-        'passwordConfirm',
-    ),
+    simpleField(['firstName', 'lastName']),
+    email(),
+    password(),
+    comparePassword(),
     validate,
     singup,
 );
-router.post('/login', generateRules('email', 'password'), validate, login);
-router.post(
-    '/forget_my_password',
-    generateRules('email'),
-    validate,
-    forgetPossword,
-);
-router.post(
-    '/reset_password/:resetToken',
-    generateRules('password'),
-    validate,
-    resetPassword,
-);
+router.post('/login', email(), password(), validate, login);
+router.post('/forget_my_password', email(), validate, forgetPossword);
+router.post('/reset_password/:resetToken', password(), validate, resetPassword);
 
 // isAuthenticated middleware
 router.use(authMiddelware);
 
 router.post(
     '/update_profile',
-    generateRules('email', 'firstName', 'lastName'),
+    email(),
+    simpleField(['firstName', 'lastName']),
     validate,
     updateProfile,
 );
@@ -62,7 +56,8 @@ router.post(
 );
 router.post(
     '/update_password',
-    generateRules('password', 'newPassword', 'newPasswordConfirm'),
+    password(['password', 'newPassword']),
+    comparePassword('newPassword', 'newPasswordConfirm'),
     validate,
     updatePassword,
 );
