@@ -20,7 +20,7 @@ export const updateProfile = catchAsync(
         if (password) {
             return next(
                 new AppError(
-                    'To update the password please use the /updatePassword endpoint.',
+                    'To update the password please use the /update_password endpoint.',
                     404,
                 ),
             );
@@ -86,7 +86,7 @@ export const updateProfileImage = catchAsync(
 
 export const updatePassword = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { currentPassword, newPassword } = req.body;
+        const { password, newPassword } = req.body;
         const userWithoutPassword = req.user;
         if (!userWithoutPassword) {
             return next(new AppError('Unauthorized!', 401));
@@ -95,13 +95,9 @@ export const updatePassword = catchAsync(
             '+password',
         );
 
-        // check if the user password matches the given currentPassword
+        // check if the user password matches the given password
         if (
-            (user &&
-                !(await user.comparePassword(
-                    user.password,
-                    currentPassword,
-                ))) ||
+            (user && !(await user.comparePassword(user.password, password))) ||
             !user
         ) {
             return next(

@@ -6,33 +6,66 @@ import {
     resetPassword,
     authMiddelware,
     logout,
+    forgetPossword,
 } from '../controllers/authControlles';
 import {
     updatePassword,
     updateProfile,
     updateProfileImage,
 } from '../controllers/userController';
+import { validate, generateRules } from '../utils/validators';
 
 const router = express.Router();
 
 // TODO: validation middleware
 // TODO: signupwithinvitation
 
-router.post('/signup', singup);
-router.post('/login', login);
-router.post('/forget_my_password');
-router.post('/reset_password/:resetToken', resetPassword);
+router.post(
+    '/signup',
+    generateRules(
+        'firstName',
+        'lastName',
+        'email',
+        'password',
+        'passwordConfirm',
+    ),
+    validate,
+    singup,
+);
+router.post('/login', generateRules('email', 'password'), validate, login);
+router.post(
+    '/forget_my_password',
+    generateRules('email'),
+    validate,
+    forgetPossword,
+);
+router.post(
+    '/reset_password/:resetToken',
+    generateRules('password'),
+    validate,
+    resetPassword,
+);
 
 // isAuthenticated middleware
 router.use(authMiddelware);
 
-router.post('/update_profile', updateProfile);
+router.post(
+    '/update_profile',
+    generateRules('email', 'firstName', 'lastName'),
+    validate,
+    updateProfile,
+);
 router.post(
     '/update_profile_image',
     singlePhoto('users_profile', 'avatar'),
     updateProfileImage,
 );
-router.post('/update_password', updatePassword);
+router.post(
+    '/update_password',
+    generateRules('password', 'newPassword', 'newPasswordConfirm'),
+    validate,
+    updatePassword,
+);
 router.post('/logout', logout);
 
 export { router as userRouter };

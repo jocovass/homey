@@ -31,9 +31,17 @@ const rules: Rules = {
         .not()
         .isEmpty()
         .withMessage('Field is required.')
-        .escape()
-        .isStrongPassword()
-        .withMessage('Password is weak.'),
+        .escape(),
+    // .isStrongPassword()
+    // .withMessage('Password is weak.'),
+    newPassword: body('newPassword')
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage('Field is required.')
+        .escape(),
+    // .isStrongPassword()
+    // .withMessage('Password is weak.'),
     passwordConfirm: body('passwordConfirm')
         .trim()
         .not()
@@ -42,6 +50,20 @@ const rules: Rules = {
         .escape()
         .custom((val, { req }) => {
             if (val !== req.body.password)
+                throw new Error(
+                    'Password confirmation does not match password.',
+                );
+
+            return true;
+        }),
+    newPasswordConfirm: body('newPasswordConfirm')
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage('Field is required.')
+        .escape()
+        .custom((val, { req }) => {
+            if (val !== req.body.newPassword)
                 throw new Error(
                     'Password confirmation does not match password.',
                 );
