@@ -27,10 +27,6 @@ export const getRecipes = catchAsync(
         const { householdId } = req.body;
         const { page = 1, perPage = 20, tags, search } = req.query;
 
-        if (!householdId) {
-            return next(new AppError('Must provide householdId.', 400));
-        }
-
         const filters: {
             tags?: { $in: string[] };
             $text?: { $search: string };
@@ -90,10 +86,6 @@ export const updateRecipe = catchAsync(
         const { title, tags, ingredients, url, instructions, note } = req.body;
         const { recipeId } = req.params;
 
-        if (!recipeId) {
-            return next(new AppError('Must provide recipeId', 400));
-        }
-
         const recipe = await Recipe.findByIdAndUpdate(
             recipeId,
             {
@@ -126,10 +118,6 @@ export const updateRecipeCooked = catchAsync(
         const { recipeId } = req.params;
         const { cooked } = req.body;
 
-        if (!recipeId) {
-            return next(new AppError('Must provide recipeId', 400));
-        }
-
         const recipe = await Recipe.findByIdAndUpdate(
             recipeId,
             {
@@ -155,7 +143,7 @@ export const updateRecipePhoto = catchAsync(
         const { file } = req;
         const { recipeId } = req.params;
 
-        if (!file || !recipeId) {
+        if (!file) {
             return next(
                 new AppError('Photo and recipeId must be provided.', 400),
             );
