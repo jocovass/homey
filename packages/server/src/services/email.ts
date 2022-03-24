@@ -9,6 +9,41 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+export const sendInvitationEmail = async ({
+    emailTo,
+    url,
+    emailFrom,
+    nameFrom,
+    householdName,
+}: {
+    emailTo: string;
+    url: string;
+    emailFrom: string;
+    nameFrom: string;
+    householdName: string;
+}) => {
+    const mailOptions = {
+        from: emailFrom,
+        to: emailTo,
+        subject: `Invitaton from ${nameFrom}`,
+        html: `
+        <div style="text-align: center;">
+            <h1>Follow this link to join ${householdName}</h1>
+            <a href="${url}" target='_blank'>Accept Invitation</a>
+            <strong>Invitation is valid for 1 month!</strong>
+        </div>
+        `,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log(`Invitation sent: ${info.response}`);
+        }
+    });
+};
+
 export const sendPasswordResetEmail = async ({
     emailTo,
     resetURL,
@@ -26,7 +61,6 @@ export const sendPasswordResetEmail = async ({
             <a href="${resetURL}" target='_blank'>Reset password</a>
             <strong>Your password reset token is valid for 10 minutes!</strong>
         </div>
-
         `,
     };
 
@@ -34,7 +68,7 @@ export const sendPasswordResetEmail = async ({
         if (error) {
             console.log(error);
         } else {
-            console.log('Email sent: ' + info.response);
+            console.log(`Email sent: ${info.response}`);
         }
     });
 };

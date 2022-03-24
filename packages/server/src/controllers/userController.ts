@@ -4,6 +4,7 @@ import { User } from '../models/userModel';
 import { AppError } from '../utils/appError';
 import { catchAsync } from '../utils/catchAsync';
 import { deletePhoto } from '../services/cloudinary';
+import { sendInvitationEmail } from '../services/email';
 
 interface UpdateProfile {
     email?: string;
@@ -110,6 +111,61 @@ export const updatePassword = catchAsync(
 
         res.status(200).json({
             message: 'Password updated successfully.',
+        });
+    },
+);
+
+export const sendInvitation = catchAsync(
+    async (
+        req: Request<
+            undefined,
+            Promise<void>,
+            { email: string; householdId: string; householdName: string }
+        >,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const currentUser = req.user;
+        const { email, householdId, householdName } = req.body;
+
+        // find user with email and update invitations
+        const user = await User.findOneAndUpdate(
+            { email },
+            {
+                $push: {
+                    invitations: {
+                        household: householdId,
+                        invitedBy: currentUser?.email,
+                        status: 'pending',
+                    },
+                },
+            },
+            {
+                new: true,
+            },
+        );
+
+        // if user doesn't exit send and invitation to sign up
+        if (!user) {
+            if (!currentUser) {
+                return next(new AppError('Unauthorized operation.', 401));
+            }
+
+            const url = `${req.protocol}://${req.get(
+                'host',
+            )}/api/v1/users/sign_up_with_invitation/${householdId}`;
+
+            await sendInvitationEmail({
+                emailTo: email,
+                emailFrom: currentUser.email,
+                nameFrom: `${currentUser.firstName} ${currentUser.lastName}`,
+                householdName,
+                url,
+            });
+        }
+
+        res.status(200).json({
+            message: 'Invitation was successful',
         });
     },
 );

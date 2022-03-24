@@ -2,7 +2,7 @@ import { Schema, Model, Types, model, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
-interface IUserInvitation {
+interface IUserInvitations {
     _id?: Types.ObjectId;
     invitedBy: Types.ObjectId;
     household: Types.ObjectId;
@@ -22,7 +22,7 @@ interface IUserBase {
     lastName: string;
     email: string;
     avatar?: string;
-    invitation?: IUserInvitation;
+    invitations?: IUserInvitations[];
     household?: IUserHousehold | null;
 }
 
@@ -79,21 +79,26 @@ const userSchema = new Schema<IUserBack, UserModel>(
                 ref: 'Household',
             },
         },
-        invitation: {
-            status: {
-                type: String,
-                enum: ['pending', 'accepted', 'rejected'],
+        invitations: [
+            {
+                status: {
+                    type: String,
+                    enum: ['pending', 'accepted', 'rejected'],
+                },
+                invitedBy: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'User',
+                },
+                createdAt: {
+                    type: Date,
+                    default: Date.now(),
+                },
+                household: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Household',
+                },
             },
-            invitedBy: {
-                type: Schema.Types.ObjectId,
-                ref: 'User',
-            },
-            createdAt: Date,
-            household: {
-                type: Schema.Types.ObjectId,
-                ref: 'Household',
-            },
-        },
+        ],
         passwordResetToken: String,
         passwordResetExpires: Date,
     },

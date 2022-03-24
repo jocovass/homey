@@ -9,6 +9,7 @@ import {
     forgetPossword,
 } from '../controllers/authControlles';
 import {
+    sendInvitation,
     updatePassword,
     updateProfile,
     updateProfileImage,
@@ -23,7 +24,7 @@ import {
 
 const router = express.Router();
 
-// TODO: validation middleware
+// TODO: send invitation
 // TODO: signupwithinvitation
 
 router.post(
@@ -41,6 +42,8 @@ router.post('/reset_password/:resetToken', password(), validate, resetPassword);
 
 // isAuthenticated middleware
 router.use(authMiddelware);
+
+router.post('/send_invitation', sendInvitation);
 
 router.post(
     '/update_profile',
