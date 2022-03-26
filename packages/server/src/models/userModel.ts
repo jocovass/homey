@@ -75,7 +75,6 @@ const userSchema = new Schema<IUserBack, UserModel>(
             },
             joined: {
                 type: Date,
-                default: Date.now(),
             },
             householdRef: {
                 type: Schema.Types.ObjectId,
@@ -117,6 +116,10 @@ userSchema.pre<IUserBack>('save', async function (next): Promise<void> {
         return next();
     }
     this.password = await bcrypt.hash(this.password, 12);
+});
+
+userSchema.pre(['find', 'findOne'], function (next): void {
+    this.find({ active: { $ne: false } });
 });
 
 userSchema.method<IUserBack>(

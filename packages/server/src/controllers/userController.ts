@@ -175,3 +175,59 @@ export const sendInvitation = catchAsync(
         });
     },
 );
+
+export const acceptInvitation = catchAsync(
+    async (
+        req: Request<
+            undefined,
+            Promise<void>,
+            { householdId: Types.ObjectId; invitationId: Types.ObjectId }
+        >,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const currentUser = req.user;
+        const { householdId, invitationId } = req.body;
+
+        if (!currentUser) {
+            return next(new AppError('Unauthorized operation.', 401));
+        }
+
+        if (currentUser.household?.householdRef) {
+            return next(
+                new AppError(
+                    "Can't be member of multiple household at the same time.",
+                    400,
+                ),
+            );
+        }
+
+        currentUser.invitations?.forEach(invitation => {
+            if (String(invitation._id) === String(invitationId)) {
+                if (invitation.status !== 'pending') {
+                    return next(
+                        new AppError(
+                            "This invitation doesn't exists or no longer valid",
+                            400,
+                        ),
+                    );
+                }
+                invitation.status = 'accepted';
+            }
+        });
+
+        currentUser.household = {
+            householdRef: householdId,
+            role: 'member',
+            joined: new Date(),
+        };
+
+        await currentUser.save();
+
+        res.status(200).json({
+            data: {
+                user: currentUser,
+            },
+        });
+    },
+);

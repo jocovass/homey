@@ -10,6 +10,7 @@ import {
     forgetPossword,
 } from '../controllers/authControlles';
 import {
+    acceptInvitation,
     sendInvitation,
     updatePassword,
     updateProfile,
@@ -58,7 +59,7 @@ router.post(
 router.use(authMiddelware);
 
 router.post('/send_invitation', sendInvitation);
-
+router.post('/accept_invitation', acceptInvitation);
 router.post(
     '/update_profile',
     email(),
