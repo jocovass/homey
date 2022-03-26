@@ -2,6 +2,7 @@ import express from 'express';
 import { singlePhoto } from '../services/cloudinary';
 import {
     singup,
+    signUpWithInvitation,
     login,
     resetPassword,
     authMiddelware,
@@ -20,12 +21,10 @@ import {
     email,
     password,
     comparePassword,
+    checkParams,
 } from '../utils/validators';
 
 const router = express.Router();
-
-// TODO: send invitation
-// TODO: signupwithinvitation
 
 router.post(
     '/signup',
@@ -36,9 +35,24 @@ router.post(
     validate,
     singup,
 );
+router.post(
+    '/signup_with_invitation/:householdId',
+    email(),
+    password(),
+    comparePassword(),
+    checkParams('householdId'),
+    validate,
+    signUpWithInvitation,
+);
 router.post('/login', email(), password(), validate, login);
 router.post('/forget_my_password', email(), validate, forgetPossword);
-router.post('/reset_password/:resetToken', password(), validate, resetPassword);
+router.post(
+    '/reset_password/:resetToken',
+    password(),
+    checkParams('resetToken'),
+    validate,
+    resetPassword,
+);
 
 // isAuthenticated middleware
 router.use(authMiddelware);

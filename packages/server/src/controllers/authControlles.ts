@@ -7,6 +7,7 @@ import { sendPasswordResetEmail } from '../services/email';
 import { IUserBack, User } from '../models/userModel';
 import { AppError } from '../utils/appError';
 import { catchAsync } from '../utils/catchAsync';
+import { Household } from '../models/householdModel';
 
 const SECRET = process.env.JWT_SECRET || 'TEST';
 const signToken = (id: Types.ObjectId) => {
@@ -26,7 +27,7 @@ declare module 'express-serve-static-core' {
 type CreateSendToken = (
     user: IUserBack,
     statusCode: number,
-    req: Request,
+    req: Request<any>,
     res: Response,
 ) => void;
 
@@ -65,6 +66,41 @@ export const singup = catchAsync(
             firstName,
             lastName,
             password,
+        });
+
+        createSendToken(user, 201, req, res);
+    },
+);
+
+export const signUpWithInvitation = catchAsync(
+    async (
+        req: Request<
+            { householdId: Types.ObjectId },
+            Promise<void>,
+            SignupProps
+        >,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const { householdId } = req.params;
+        const { email, firstName, lastName, password } = req.body;
+
+        const household = await Household.findById(householdId);
+        if (!household) {
+            return next(
+                new AppError(
+                    "The household id provided is invalid or the household doesn't exists.",
+                    404,
+                ),
+            );
+        }
+
+        const user = await User.create({
+            email,
+            firstName,
+            lastName,
+            password,
+            household: { householdRef: householdId, role: 'member' },
         });
 
         createSendToken(user, 201, req, res);

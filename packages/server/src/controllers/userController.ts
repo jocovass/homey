@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Types } from 'mongoose';
 
 import { User } from '../models/userModel';
 import { AppError } from '../utils/appError';
@@ -120,7 +121,11 @@ export const sendInvitation = catchAsync(
         req: Request<
             undefined,
             Promise<void>,
-            { email: string; householdId: string; householdName: string }
+            {
+                email: string;
+                householdId: Types.ObjectId;
+                householdName: string;
+            }
         >,
         res: Response,
         next: NextFunction,
@@ -135,7 +140,7 @@ export const sendInvitation = catchAsync(
                 $push: {
                     invitations: {
                         household: householdId,
-                        invitedBy: currentUser?.email,
+                        invitedBy: currentUser?._id,
                         status: 'pending',
                     },
                 },
@@ -153,8 +158,9 @@ export const sendInvitation = catchAsync(
 
             const url = `${req.protocol}://${req.get(
                 'host',
-            )}/api/v1/users/sign_up_with_invitation/${householdId}`;
-
+            )}/api/v1/users/signup_with_invitation/${householdId}`;
+            console.log('emalto', email);
+            console.log('emailfrom', currentUser.email);
             await sendInvitationEmail({
                 emailTo: email,
                 emailFrom: currentUser.email,

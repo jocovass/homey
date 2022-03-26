@@ -73,7 +73,10 @@ const userSchema = new Schema<IUserBack, UserModel>(
                 type: String,
                 enum: ['admin', 'member', 'owner'],
             },
-            joined: Date,
+            joined: {
+                type: Date,
+                default: Date.now(),
+            },
             householdRef: {
                 type: Schema.Types.ObjectId,
                 ref: 'Household',
