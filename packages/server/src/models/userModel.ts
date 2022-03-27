@@ -118,10 +118,6 @@ userSchema.pre<IUserBack>('save', async function (next): Promise<void> {
     this.password = await bcrypt.hash(this.password, 12);
 });
 
-userSchema.pre(['find', 'findOne'], function (next): void {
-    this.find({ active: { $ne: false } });
-});
-
 userSchema.method<IUserBack>(
     'comparePassword',
     function (

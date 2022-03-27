@@ -133,34 +133,41 @@ export const sendInvitation = catchAsync(
         const currentUser = req.user;
         const { email, householdId, householdName } = req.body;
 
+        if (!currentUser) {
+            return next(new AppError('Unauthorized operation.', 401));
+        }
+
         // find user with email and update invitations
-        const user = await User.findOneAndUpdate(
-            { email },
-            {
-                $push: {
-                    invitations: {
-                        household: householdId,
-                        invitedBy: currentUser?._id,
-                        status: 'pending',
-                    },
-                },
-            },
-            {
-                new: true,
-            },
-        );
+        const user = await User.findOne({
+            email,
+        });
+
+        if (user) {
+            const matchingInvitation = user.invitations?.filter(invitation => {
+                return (
+                    String(invitation.household) === String(householdId) &&
+                    String(invitation.invitedBy) === String(currentUser._id) &&
+                    invitation.status === 'pending'
+                );
+            });
+
+            if (matchingInvitation && !matchingInvitation.length) {
+                user.invitations?.push({
+                    household: householdId,
+                    invitedBy: currentUser._id,
+                    status: 'pending',
+                    createdAt: new Date(),
+                });
+
+                await user.save();
+            }
+        }
 
         // if user doesn't exit send and invitation to sign up
         if (!user) {
-            if (!currentUser) {
-                return next(new AppError('Unauthorized operation.', 401));
-            }
-
             const url = `${req.protocol}://${req.get(
                 'host',
             )}/api/v1/users/signup_with_invitation/${householdId}`;
-            console.log('emalto', email);
-            console.log('emailfrom', currentUser.email);
             await sendInvitationEmail({
                 emailTo: email,
                 emailFrom: currentUser.email,
