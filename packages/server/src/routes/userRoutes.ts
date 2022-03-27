@@ -11,6 +11,7 @@ import {
 } from '../controllers/authControlles';
 import {
     acceptInvitation,
+    leaveHousehold,
     rejectInvitation,
     sendInvitation,
     updatePassword,
@@ -59,9 +60,30 @@ router.post(
 // isAuthenticated middleware
 router.use(authMiddelware);
 
-router.post('/send_invitation', sendInvitation);
-router.post('/accept_invitation', acceptInvitation);
-router.post('/reject_invitation', rejectInvitation);
+router.post(
+    '/send_invitation',
+    simpleField(['householdName, householdId', 'email']),
+    validate,
+    sendInvitation,
+);
+router.post(
+    '/accept_invitation',
+    simpleField(['householdId', 'invitationId']),
+    validate,
+    acceptInvitation,
+);
+router.post(
+    '/reject_invitation',
+    simpleField('invitationId'),
+    validate,
+    rejectInvitation,
+);
+router.post(
+    '/leave_household',
+    simpleField('householdId'),
+    validate,
+    leaveHousehold,
+);
 router.post(
     '/update_profile',
     email(),

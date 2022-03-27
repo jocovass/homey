@@ -274,3 +274,34 @@ export const rejectInvitation = catchAsync(
         });
     },
 );
+
+export const leaveHousehold = catchAsync(
+    async (
+        req: Request<undefined, Promise<void>, { householdId: Types.ObjectId }>,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const currentUser = req.user;
+        const { householdId } = req.body;
+
+        if (!currentUser) {
+            return next(new AppError('Unauthorized operation.', 401));
+        }
+
+        if (
+            String(currentUser.household?.householdRef) !== String(householdId)
+        ) {
+            return next(new AppError('Wrong household ID provided.', 404));
+        }
+
+        currentUser.household = undefined;
+
+        await currentUser.save();
+
+        res.status(200).json({
+            data: {
+                user: currentUser,
+            },
+        });
+    },
+);
