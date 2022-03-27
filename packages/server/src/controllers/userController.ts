@@ -238,3 +238,39 @@ export const acceptInvitation = catchAsync(
         });
     },
 );
+
+export const rejectInvitation = catchAsync(
+    async (
+        req: Request<
+            undefined,
+            Promise<void>,
+            { invitationId: Types.ObjectId }
+        >,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        const currentUser = req.user;
+        const { invitationId } = req.body;
+
+        if (!currentUser) {
+            return next(new AppError('Unauthorized operation.', 401));
+        }
+
+        currentUser.invitations?.forEach(invitation => {
+            if (
+                String(invitation._id) === String(invitationId) &&
+                invitation.status === 'pending'
+            ) {
+                invitation.status = 'rejected';
+            }
+        });
+
+        await currentUser.save();
+
+        res.status(200).json({
+            data: {
+                user: currentUser,
+            },
+        });
+    },
+);

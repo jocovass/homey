@@ -11,6 +11,7 @@ import {
 } from '../controllers/authControlles';
 import {
     acceptInvitation,
+    rejectInvitation,
     sendInvitation,
     updatePassword,
     updateProfile,
@@ -60,6 +61,7 @@ router.use(authMiddelware);
 
 router.post('/send_invitation', sendInvitation);
 router.post('/accept_invitation', acceptInvitation);
+router.post('/reject_invitation', rejectInvitation);
 router.post(
     '/update_profile',
     email(),
