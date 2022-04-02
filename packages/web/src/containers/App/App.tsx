@@ -2,16 +2,12 @@ import React from 'react';
 import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import Authenticated from '../Authenticated/Authenticated';
 import UnAuthenticated from '../UnAuthenticated/UnAuthenticated';
-import './App.css';
 
 function App() {
     const navigateTo = useNavigate();
 
     return (
-        <div className="App">
-            {/* {user ? <Navigate /> : <UnAuthenticated />} */}
-            {/* <Auth />
-            <Account /> */}
+        <div className="bg-background">
             <nav>
                 <Link to="/account">account</Link>
                 {'  '}
