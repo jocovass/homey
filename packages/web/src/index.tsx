@@ -2,13 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
-import App from './containers/App/App';
+import App from './views/App';
+import { ThemeProvider } from '@emotion/react';
 import reportWebVitals from './reportWebVitals';
+import { theme } from './styled/theme';
 
 ReactDOM.render(
     <React.StrictMode>
         <Router>
-            <App />
+            <ThemeProvider theme={theme}>
+                <App />
+            </ThemeProvider>
         </Router>
     </React.StrictMode>,
     document.getElementById('root'),

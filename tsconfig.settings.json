@@ -14,7 +14,7 @@
     "noImplicitAny": true,
     /* Module resolution options */
     "moduleResolution": "node",
-    "baseUrl": ".",
+
     "esModuleInterop": true,
     /* Experimental options */
     "experimentalDecorators": true,
