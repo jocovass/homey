@@ -1,11 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import './index.css';
+import './index.scss';
 import App from './views/App';
 import { ThemeProvider } from '@emotion/react';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './styled/theme';
+
+type AppTheme = typeof theme;
+declare module '@emotion/react' {
+    export interface Theme extends AppTheme {}
+}
 
 ReactDOM.render(
     <React.StrictMode>
