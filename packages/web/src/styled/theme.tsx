@@ -1,8 +1,9 @@
 import { css } from '@emotion/react';
-
+// a6bdbb
 export const theme = {
     colors: {
-        greenLight: '#EEF4F4',
+        greenLighter: '#EEF4F4',
+        greenLight: '#dce7e6',
         greenAccent: '#6CB2B2',
         greenGrey: '#A6BDBB',
         greenBlack: '#052425',
@@ -34,6 +35,7 @@ export const globalStyles = css`
     }
     html {
         font-size: 62.5%; // set the root fontsize to 10px
+        --clr-greenLighter: ${theme.colors.greenLighter};
         --clr-greenLight: ${theme.colors.greenLight};
         --clr-greenAccent: ${theme.colors.greenAccent};
         --clr-greenGrey: ${theme.colors.greenGrey};
@@ -54,7 +56,8 @@ export const globalStyles = css`
     }
     body {
         font-family: ${theme.fontFamily.lora};
-        background-color: ${theme.colors.greenLight};
+        background-color: ${theme.colors.greenLighter};
+        color: ${theme.colors.greenDark};
     }
 
     h1,

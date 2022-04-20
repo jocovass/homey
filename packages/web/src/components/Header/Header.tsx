@@ -1,5 +1,11 @@
+/** @jsxRuntime classic */
+/** @jsx jsx */
+// eslint-disable-next-line no-unused-vars
+import { jsx, css } from '@emotion/react';
 import { Link, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
+
+import { PrimaryButton } from '../Elements/Buttons';
 
 const StyledHeader = styled.header`
     padding: 1.5rem 5vw;
@@ -54,7 +60,9 @@ const StyledHeader = styled.header`
         text-decoration: none;
         position: relative;
         padding: 0.4em;
-        transition: color 0.2s ease-in-out;
+        transition-property: color;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
         &::after {
             content: '';
@@ -66,7 +74,9 @@ const StyledHeader = styled.header`
             background-color: ${props => props.theme.colors.greenAccent};
             transform-origin: center;
             transform: translateX(-50%) scaleX(0);
-            transition: transform 0.2s ease-in-out;
+            transition-property: transform;
+            transition-duration: 300ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         &:hover,
@@ -80,27 +90,6 @@ const StyledHeader = styled.header`
         }
     }
 `;
-
-const PrimaryButton = styled(Link)(
-    props => `
-    text-decoration: none;
-    color: ${props.theme.colors.greenDark};
-    border: .125em solid ${props.theme.colors.greenDark};
-    border-radius: 100px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    padding: .25em 1em;
-    margin-left: 2rem;
-
-    box-shadow: inset 0 0 0.2em 0 ${props.theme.colors.greenDark}, 0 0 0.2em 0 ${props.theme.colors.greenDark};
-    transition: background .2s ease-in-out, color .2s ease-in-out;
-
-    &:hover {
-        background-color: ${props.theme.colors.greenDark};
-        color: ${props.theme.colors.greenLight};
-    }
-`,
-);
 
 export const Header = () => {
     return (
@@ -121,7 +110,13 @@ export const Header = () => {
                         </NavLink>
                     </li>
                 </ul>
-                <PrimaryButton to="/login">Login</PrimaryButton>
+                <PrimaryButton
+                    css={{ marginLeft: '2rem' }}
+                    as={Link}
+                    to="/login"
+                >
+                    Log in / Sign up
+                </PrimaryButton>
             </nav>
         </StyledHeader>
     );
