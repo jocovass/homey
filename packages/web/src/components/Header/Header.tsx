@@ -24,6 +24,8 @@ const StyledHeader = styled.header`
             #fff 50%,
             #000 50%
         );
+        /* background-image: ${props =>
+            `linear-gradient(to right, ${props.theme.colors.greenLight} 0%, ${props.theme.colors.greenLight} 50%, #000 50%)`}; */
         position: relative;
         font-size: 3.3rem;
         font-weight: bold;
@@ -33,6 +35,7 @@ const StyledHeader = styled.header`
 
         span {
             color: #fff;
+            /* color: ${props => props.theme.colors.greenLight}; */
             mix-blend-mode: exclusion;
         }
     }

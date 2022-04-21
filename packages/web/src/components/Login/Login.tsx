@@ -2,10 +2,14 @@
 /** @jsx jsx */
 // eslint-disable-next-line no-unused-vars
 import { jsx, css, useTheme } from '@emotion/react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
+import { GoChevronRight } from 'react-icons/go';
 
+import axios from '../../util/axios';
 import { PrimaryButton } from '../Elements/Buttons';
+import { BtnLoader } from '../Elements/BtnLoader';
 
 const StyledLogin = styled.div`
     max-width: 650px;
@@ -60,8 +64,34 @@ const StyledLogin = styled.div`
     }
 `;
 
+interface FormElements extends HTMLFormControlsCollection {
+    email: HTMLInputElement;
+    password: HTMLInputElement;
+}
+
+interface LoginFormElement extends HTMLFormElement {
+    readonly elements: FormElements;
+}
+
 export const Login = () => {
     const theme = useTheme();
+    const [loading, setLoading] = React.useState(false);
+
+    const handleSubmit = (e: React.FormEvent<LoginFormElement>) => {
+        e.preventDefault();
+        // console.log(e.currentTarget.elements.email.value);
+        // console.log(e.currentTarget.elements.password.value);
+        // axios
+        //     .post('/users/login', {
+        //         email: e.currentTarget.elements.email.value,
+        //         password: e.currentTarget.elements.password.value,
+        //     })
+        //     .then(res => console.log(res))
+        //     .catch((error: any) => console.error(error.stack));
+
+        setLoading(!loading);
+    };
+
     return (
         <StyledLogin>
             <div css={{ textAlign: 'center' }}>
@@ -78,10 +108,11 @@ export const Login = () => {
                 </p>
             </div>
 
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="email">Email</label>
                     <input
+                        autoComplete="false"
                         type="email"
                         name="email"
                         id="email"
@@ -105,15 +136,23 @@ export const Login = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
+
+                        '> *': {
+                            flexBasis: '33.33%',
+                            textAlign: 'center',
+                        },
                     }}
                 >
-                    <PrimaryButton
-                        css={{
-                            padding: '.9em 2.5em',
-                        }}
-                    >
-                        Log in
-                    </PrimaryButton>
+                    <div>
+                        <PrimaryButton
+                            css={{
+                                padding: '.9em 2em',
+                            }}
+                        >
+                            Log in
+                            {loading ? <BtnLoader /> : null}
+                        </PrimaryButton>
+                    </div>
 
                     <span
                         css={{
@@ -125,7 +164,47 @@ export const Login = () => {
                         or
                     </span>
 
-                    <button>Register here</button>
+                    <div>
+                        <Link
+                            css={{
+                                color: theme.colors.greenDark,
+                                fontSize: '1.2rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                textDecoration: 'none',
+
+                                span: {
+                                    transform: 'translateX(0)',
+                                    transitionProperty: 'transform',
+                                    transitionDuration: '300ms',
+                                    transitionTimingFunction:
+                                        'cubic-bezier(0.4, 0, 0.2, 1)',
+                                },
+
+                                svg: {
+                                    transform: 'scale(0) translateX(20px)',
+                                    opacity: 0,
+                                    transitionProperty: 'transform opacity',
+                                    transitionDuration: '300ms',
+                                    transitionTimingFunction:
+                                        'cubic-bezier(0.4, 0, 0.2, 1)',
+                                },
+
+                                '&:hover span': {
+                                    transform: 'translateX(-2px)',
+                                },
+
+                                '&:hover svg': {
+                                    transform: 'scale(1) translateX(0px)',
+                                    opacity: 1,
+                                },
+                            }}
+                            to="/register"
+                        >
+                            <span>Sign up here</span>
+                            <GoChevronRight />
+                        </Link>
+                    </div>
                 </div>
 
                 <div>
