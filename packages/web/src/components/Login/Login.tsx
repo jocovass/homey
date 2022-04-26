@@ -76,7 +76,7 @@ interface LoginFormElement extends HTMLFormElement {
 export const Login = () => {
     const theme = useTheme();
     const {
-        state: { user, status, errors, globalError },
+        state: { status, errors, globalError },
         dispatch,
     } = useAuth();
 
