@@ -5,12 +5,7 @@ import './index.scss';
 import App from './views/App';
 import { ThemeProvider } from '@emotion/react';
 import reportWebVitals from './reportWebVitals';
-import { theme } from './styled/theme';
-
-type AppTheme = typeof theme;
-declare module '@emotion/react' {
-    export interface Theme extends AppTheme {}
-}
+import { theme } from './styles/theme';
 
 ReactDOM.render(
     <React.StrictMode>

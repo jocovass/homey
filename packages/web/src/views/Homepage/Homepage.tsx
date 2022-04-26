@@ -1,3 +1,11 @@
+import { useAuth } from '../../context/authContext';
+
 export const Homepage = () => {
-    return <h1>Homepage</h1>;
+    const { state, dispatch } = useAuth();
+    return (
+        <>
+            <h1>Homepage</h1>
+            <pre>{JSON.stringify(state, null, 2)}</pre>
+        </>
+    );
 };

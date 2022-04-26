@@ -12,7 +12,12 @@ const app = express();
 
 // Cross Origin Resource Sharing
 // HTTP header based mechanism, allows a server to indicate any origins other than its own from which a browser should permit loading resources
-app.use(cors());
+app.use(
+    cors({
+        credentials: true,
+        origin: 'http://localhost:3000',
+    }),
+);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));

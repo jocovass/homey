@@ -2,14 +2,14 @@
 /** @jsx jsx */
 // eslint-disable-next-line no-unused-vars
 import { jsx, css, useTheme } from '@emotion/react';
-import React from 'react';
 import styled from '@emotion/styled';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
 
-import axios from '../../util/axios';
-import { PrimaryButton } from '../Elements/Buttons';
-import { BtnLoader } from '../Elements/BtnLoader';
+import { useAuth, login } from '../../context/authContext';
+import { PrimaryButton } from '../ui/Buttons';
+import { BtnLoader } from '../ui/BtnLoader';
 
 const StyledLogin = styled.div`
     max-width: 650px;
@@ -75,22 +75,26 @@ interface LoginFormElement extends HTMLFormElement {
 
 export const Login = () => {
     const theme = useTheme();
-    const [loading, setLoading] = React.useState(false);
+    const {
+        state: { user, status, errors, globalError },
+        dispatch,
+    } = useAuth();
+
+    const isLoading = status === 'pending';
+    const success = status === 'success';
+    const isError = status === 'error';
 
     const handleSubmit = (e: React.FormEvent<LoginFormElement>) => {
         e.preventDefault();
-        // console.log(e.currentTarget.elements.email.value);
-        // console.log(e.currentTarget.elements.password.value);
-        // axios
-        //     .post('/users/login', {
-        //         email: e.currentTarget.elements.email.value,
-        //         password: e.currentTarget.elements.password.value,
-        //     })
-        //     .then(res => console.log(res))
-        //     .catch((error: any) => console.error(error.stack));
-
-        setLoading(!loading);
+        login(dispatch, {
+            email: e.currentTarget.elements.email.value,
+            password: e.currentTarget.elements.password.value,
+        });
     };
+
+    if (success) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <StyledLogin>
@@ -110,7 +114,25 @@ export const Login = () => {
 
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="email">Email</label>
+                    <div
+                        css={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <label htmlFor="email">Email</label>
+                        {isError && errors?.email ? (
+                            <p
+                                css={{
+                                    color: theme.colors.orangeRed,
+                                    fontSize: '1.2rem',
+                                }}
+                            >
+                                {errors.email}
+                            </p>
+                        ) : null}
+                    </div>
                     <input
                         autoComplete="false"
                         type="email"
@@ -121,7 +143,25 @@ export const Login = () => {
                 </div>
 
                 <div>
-                    <label htmlFor="password">Password</label>
+                    <div
+                        css={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <label htmlFor="password">Password</label>
+                        {isError && errors?.password ? (
+                            <p
+                                css={{
+                                    color: theme.colors.orangeRed,
+                                    fontSize: '1.2rem',
+                                }}
+                            >
+                                {errors.password}
+                            </p>
+                        ) : null}
+                    </div>
                     <input
                         type="password"
                         name="password"
@@ -132,27 +172,26 @@ export const Login = () => {
 
                 <div
                     css={{
-                        marginBottom: '2rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-
-                        '> *': {
-                            flexBasis: '33.33%',
-                            textAlign: 'center',
-                        },
                     }}
                 >
-                    <div>
-                        <PrimaryButton
-                            css={{
-                                padding: '.9em 2em',
-                            }}
-                        >
-                            Log in
-                            {loading ? <BtnLoader /> : null}
-                        </PrimaryButton>
-                    </div>
+                    <PrimaryButton
+                        css={{
+                            padding: '.9em',
+                            width: '15rem',
+
+                            '&:disabled': {
+                                cursor: 'not-allowed',
+                                opacity: '0.5',
+                            },
+                        }}
+                        disabled={isLoading}
+                    >
+                        Log in
+                        {isLoading ? <BtnLoader /> : null}
+                    </PrimaryButton>
 
                     <span
                         css={{
@@ -164,50 +203,61 @@ export const Login = () => {
                         or
                     </span>
 
-                    <div>
-                        <Link
-                            css={{
-                                color: theme.colors.greenDark,
-                                fontSize: '1.2rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                textDecoration: 'none',
+                    <Link
+                        css={{
+                            color: theme.colors.greenDark,
+                            fontSize: '1.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            textDecoration: 'none',
 
-                                span: {
-                                    transform: 'translateX(0)',
-                                    transitionProperty: 'transform',
-                                    transitionDuration: '300ms',
-                                    transitionTimingFunction:
-                                        'cubic-bezier(0.4, 0, 0.2, 1)',
-                                },
+                            span: {
+                                transform: 'translateX(0)',
+                                transitionProperty: 'transform',
+                                transitionDuration: '300ms',
+                                transitionTimingFunction:
+                                    'cubic-bezier(0.4, 0, 0.2, 1)',
+                            },
 
-                                svg: {
-                                    transform: 'scale(0) translateX(20px)',
-                                    opacity: 0,
-                                    transitionProperty: 'transform opacity',
-                                    transitionDuration: '300ms',
-                                    transitionTimingFunction:
-                                        'cubic-bezier(0.4, 0, 0.2, 1)',
-                                },
+                            svg: {
+                                transform: 'scale(0) translateX(20px)',
+                                opacity: 0,
+                                transitionProperty: 'transform opacity',
+                                transitionDuration: '300ms',
+                                transitionTimingFunction:
+                                    'cubic-bezier(0.4, 0, 0.2, 1)',
+                            },
 
-                                '&:hover span': {
-                                    transform: 'translateX(-2px)',
-                                },
+                            '&:hover span': {
+                                transform: 'translateX(-2px)',
+                            },
 
-                                '&:hover svg': {
-                                    transform: 'scale(1) translateX(0px)',
-                                    opacity: 1,
-                                },
-                            }}
-                            to="/register"
-                        >
-                            <span>Sign up here</span>
-                            <GoChevronRight />
-                        </Link>
-                    </div>
+                            '&:hover svg': {
+                                transform: 'scale(1) translateX(0px)',
+                                opacity: 1,
+                            },
+                        }}
+                        to="/register"
+                    >
+                        <span>Sign up here</span>
+                        <GoChevronRight />
+                    </Link>
                 </div>
 
-                <div>
+                {isError && globalError ? (
+                    <div
+                        css={{
+                            color: theme.colors.orangeRed,
+                            fontSize: '1.4rem',
+                            marginTop: '1rem',
+                        }}
+                        className="error"
+                    >
+                        {globalError}
+                    </div>
+                ) : null}
+
+                <div css={{ marginTop: '2rem' }}>
                     <Link
                         css={{
                             color: theme.colors.greenGrey,

@@ -1,13 +1,14 @@
 import React from 'react';
+import axios from '../util/axios';
 
 /**
  * USER INVITATION MODEL
  */
 type UserInvitation = {
     id: string;
-    byWho: string;
-    nameOfTheHouseHold: string;
-    inviteSent: Date;
+    invitedBy: string;
+    household: string;
+    createdAt: Date;
     status: 'pending' | 'accepted' | 'rejected';
 } | null;
 
@@ -16,8 +17,8 @@ type UserInvitation = {
  */
 type UserHousehold = {
     id: string;
-    name: string;
-    memberSince: Date;
+    household: string;
+    joined: Date;
     role: 'member' | 'admin' | 'owner';
 } | null;
 
@@ -25,12 +26,13 @@ type UserHousehold = {
  * USER MODEL
  */
 type User = {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    uId: string;
+    id: string;
     createdAt: Date;
     updatedAt: Date;
-    photoUrl: string;
+    avatar: string;
     invitation: UserInvitation;
     household: UserHousehold;
 };
@@ -53,7 +55,13 @@ type LogoutAction = { type: 'logout' };
  */
 type SingupAction = {
     type: 'singup';
-    payload: { email: string; password: string; name: string };
+    payload: {
+        email: string;
+        password: string;
+        passwordConfirm: string;
+        firstName: string;
+        lastName: string;
+    };
 };
 
 /**
@@ -61,7 +69,12 @@ type SingupAction = {
  */
 type UpdateUserAction = {
     type: 'update_user';
-    payload: { emal: string; name: string; updatedAt: Date; photoUrl: string };
+    payload: {
+        emal: string;
+        firstName: string;
+        lastName: string;
+        avatar: string;
+    };
 };
 
 /**
@@ -72,34 +85,69 @@ type ResetPasswordEmail = {
     payload: { email: string };
 };
 
-/**
- * REAUTHENTICATE USER MODEL
- */
-type ReAuthenticate = {
-    type: 're_authenticate';
-    payload: { password: string };
+type StatusAction = {
+    type: 'SET_STATUS';
+    payload: { status: 'pending' | 'success' | 'error' };
 };
 
-type Actions = LoginAction | LogoutAction | SingupAction;
+type SetErrorAction = {
+    type: 'SET_ERROR';
+    payload: {
+        globalError: string | null;
+        errors: object;
+    };
+};
+
+type SetUserAction = {
+    type: 'SET_USER';
+    payload: {
+        status: 'pending' | 'success' | 'error';
+        user: User;
+    };
+};
+
+type Actions =
+    | StatusAction
+    | SetUserAction
+    | SetErrorAction
+    | ResetPasswordEmail;
 type Dispatch = (action: Actions) => void;
 type State = {
     user: User | null;
     status: 'idle' | 'pending' | 'success' | 'error';
-    error: string | null;
+    errors: {
+        email?: string;
+        password?: string;
+    } | null;
+    globalError: string | null;
 };
 type AuthProviderProps = { children: React.ReactNode };
 type AuthContextType = { state: State; dispatch: Dispatch };
 
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+AuthContext.displayName = 'AuthContext';
 
 // REDUCER
-function authReducer(state: State, action: Actions) {
+function authReducer(state: State, action: Actions): State {
     switch (action.type) {
-        case 'login':
-            // do something
-            return state;
-        case 'logout':
-            return state;
+        case 'SET_STATUS':
+            return {
+                ...state,
+                status: action.payload.status,
+            };
+        case 'SET_ERROR':
+            return {
+                ...state,
+                ...action.payload,
+                status: 'error',
+            };
+        case 'SET_USER':
+            return {
+                ...state,
+                ...action.payload,
+                errors: {},
+                globalError: null,
+            };
         default:
             throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -110,7 +158,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [state, dispatch] = React.useReducer(authReducer, {
         user: null,
         status: 'idle',
-        error: null,
+        errors: null,
+        globalError: null,
     });
 
     return (
@@ -130,3 +179,71 @@ export function useAuth() {
 
     return context;
 }
+
+// login, signup, reset password, update user settings, singup with invite, logout, checkif user is logged in
+
+export const login = async (
+    dispatch: Dispatch,
+    { email, password }: { email: string; password: string },
+) => {
+    // dispatch a start action
+    dispatch({ type: 'SET_STATUS', payload: { status: 'pending' } });
+    try {
+        const { data } = await axios.post('/users/login', {
+            email,
+            password,
+        });
+
+        dispatch({
+            type: 'SET_USER',
+            payload: {
+                user: data.data.user,
+                status: 'success',
+            },
+        });
+    } catch (error: any) {
+        // error can be global to the form like (INVALID CREDENTIALS)
+        if (error.response.data.message) {
+            dispatch({
+                type: 'SET_ERROR',
+                payload: {
+                    globalError: error.response.data.message,
+                    errors: {},
+                },
+            });
+        } else {
+            // or it can be input related (VALIDATION ERRORS)
+            /**
+             * error.response.data.errors
+             *      [
+             *          { email: 'Field is required' },
+             *          { email: 'Email is invalid' },
+             *          { password: 'Field is required' },
+             *          ...
+             *      ]
+             */
+            let errors = error.response.data?.errors?.reduce(
+                (
+                    acc: { [key: string]: string },
+                    item: { [key: string]: string },
+                ) => {
+                    let keys = Object.keys(item);
+                    if (!acc[keys[0]]) {
+                        acc[keys[0]] = item[keys[0]];
+                    }
+
+                    return acc;
+                },
+                {},
+            );
+
+            dispatch({
+                type: 'SET_ERROR',
+                payload: {
+                    errors,
+                    globalError: null,
+                },
+            });
+        }
+    }
+};

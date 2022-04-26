@@ -5,7 +5,7 @@ import { jsx, css } from '@emotion/react';
 import { Link, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 
-import { PrimaryButton } from '../Elements/Buttons';
+import { PrimaryButton } from '../ui/Buttons';
 
 const StyledHeader = styled.header`
     padding: 1.5rem 5vw;
