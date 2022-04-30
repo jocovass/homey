@@ -6,8 +6,13 @@ import styled from '@emotion/styled';
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
-import { useAuth, login } from '../../context/authContext';
+import { useUser } from '../../context/userContext';
+import { login } from '../../services/authService';
+import { formatServerError } from '../../util/utils';
 import { PrimaryButton } from '../ui/Buttons';
 import { BtnLoader } from '../ui/BtnLoader';
 
@@ -64,10 +69,62 @@ const StyledLogin = styled.div`
     }
 `;
 
+const StyledPasswordRequirements = styled.div`
+    font-size: 1.3rem;
+    color: #949494;
+    margin-bottom: 2rem;
+
+    &.error {
+        color: ${props => props.theme.colors.orangeRed};
+    }
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        padding-left: 1rem;
+    }
+
+    li {
+        flex-basis: 100%;
+        list-style-type: none;
+        margin-bottom: 0.3rem;
+
+        &.valid {
+            color: ${props => props.theme.colors.greenAccent};
+        }
+
+        @media ${props => props.theme.mq.mobile} {
+            flex-basis: 40%;
+        }
+    }
+`;
+
 interface FormElements extends HTMLFormControlsCollection {
     email: HTMLInputElement;
     password: HTMLInputElement;
 }
+
+interface IFormInputs {
+    email: string;
+    password: string;
+}
+
+const schema = yup.object({
+    email: yup
+        .string()
+        .required('Email is required.')
+        .email('Invalid email address.'),
+    password: yup
+        .string()
+        .required('Password is required.')
+        .min(8, 'Must be 8 characters minimum.'),
+    // .required('required')
+    // .min(8, 'minlength')
+    // .matches(RegExp('(.*[a-z].*)'), 'lowercase')
+    // .matches(RegExp('(.*[A-Z].*)'), 'uppercase')
+    // .matches(RegExp('(.*\\d.*)'), 'number')
+    // .matches(RegExp('[!@#$%^&*(),.?":{}|<>]'), 'special'),
+});
 
 interface LoginFormElement extends HTMLFormElement {
     readonly elements: FormElements;
@@ -75,24 +132,84 @@ interface LoginFormElement extends HTMLFormElement {
 
 export const Login = () => {
     const theme = useTheme();
+    // const [status, setStatus] = React.useState('idle');
+    // const [error, setError] = React.useState<string | null>(null);
+    const [{ status, error }, setState] = React.useState<{
+        status: 'idle' | 'pending' | 'success' | 'error';
+        error: string | null;
+    }>({
+        status: 'idle',
+        error: null,
+    });
     const {
-        state: { status, errors, globalError },
+        state: { user },
         dispatch,
-    } = useAuth();
+    } = useUser();
+    const {
+        register,
+        handleSubmit,
+        setError: setValidationError,
+        formState: { errors: validationErrors },
+    } = useForm<IFormInputs>({
+        // resolver: yupResolver(schema, { abortEarly: false }),
+        // mode: 'all',
+        // reValidateMode: 'onChange',
+        // criteriaMode: 'all',
+    });
 
     const isLoading = status === 'pending';
     const success = status === 'success';
     const isError = status === 'error';
 
-    const handleSubmit = (e: React.FormEvent<LoginFormElement>) => {
-        e.preventDefault();
-        login(dispatch, {
-            email: e.currentTarget.elements.email.value,
-            password: e.currentTarget.elements.password.value,
+    const onSubmit = (data: IFormInputs) => {
+        login({
+            email: data.email,
+            password: data.password,
+            dispatch,
+        }).catch((error: any) => {
+            if (typeof error.message === 'string') {
+                setState({
+                    status: 'error',
+                    error: error.message,
+                });
+
+                return;
+            }
+
+            let errors = formatServerError(error.errors);
+            let count = 0;
+            for (let key in errors) {
+                setValidationError(
+                    key as 'email' | 'password',
+                    {
+                        type: 'custom',
+                        message: errors[key],
+                    },
+                    { shouldFocus: count === 0 },
+                );
+                count++;
+            }
         });
     };
 
-    if (success) {
+    // const passwordErrors = validationErrors.password?.types
+    //     ? Object.entries(validationErrors.password.types).reduce(
+    //           (acc: string[], rule) => {
+    //               let validateResult = rule[1];
+    //               if (typeof validateResult === 'boolean' || !validateResult)
+    //                   return acc;
+
+    //               if (typeof validateResult === 'string') {
+    //                   return [...acc, validateResult];
+    //               }
+
+    //               return [...acc, ...validateResult];
+    //           },
+    //           [],
+    //       )
+    //     : [];
+
+    if (user) {
         return <Navigate to="/" replace />;
     }
 
@@ -112,7 +229,7 @@ export const Login = () => {
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <div
                         css={{
@@ -122,23 +239,24 @@ export const Login = () => {
                         }}
                     >
                         <label htmlFor="email">Email</label>
-                        {isError && errors?.email ? (
+                        {validationErrors?.email ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
                                     fontSize: '1.2rem',
                                 }}
                             >
-                                {errors.email}
+                                {validationErrors.email.message}
                             </p>
                         ) : null}
                     </div>
                     <input
                         autoComplete="false"
                         type="email"
-                        name="email"
                         id="email"
+                        className={validationErrors?.email ? 'error' : ''}
                         placeholder="test@gmail.com"
+                        {...register('email')}
                     />
                 </div>
 
@@ -151,24 +269,73 @@ export const Login = () => {
                         }}
                     >
                         <label htmlFor="password">Password</label>
-                        {isError && errors?.password ? (
+                        {validationErrors?.password ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
                                     fontSize: '1.2rem',
                                 }}
                             >
-                                {errors.password}
+                                {validationErrors.password.message}
                             </p>
                         ) : null}
                     </div>
                     <input
                         type="password"
-                        name="password"
                         id="password"
                         placeholder="********"
+                        className={validationErrors?.password ? 'error' : ''}
+                        {...register('password')}
                     />
                 </div>
+
+                {/* <StyledPasswordRequirements>
+                    <ul>
+                        <li
+                            className={
+                                passwordErrors.includes('lowercase')
+                                    ? ''
+                                    : 'valid'
+                            }
+                        >
+                            One lowercase character
+                        </li>
+                        <li
+                            className={
+                                passwordErrors.includes('uppercase')
+                                    ? ''
+                                    : 'valid'
+                            }
+                        >
+                            One uppercase character
+                        </li>
+                        <li
+                            className={
+                                passwordErrors.includes('number') ? '' : 'valid'
+                            }
+                        >
+                            One number
+                        </li>
+                        <li
+                            className={
+                                passwordErrors.includes('special')
+                                    ? ''
+                                    : 'valid'
+                            }
+                        >
+                            One special character
+                        </li>
+                        <li
+                            className={
+                                passwordErrors.includes('minlength')
+                                    ? ''
+                                    : 'valid'
+                            }
+                        >
+                            8 characters minimum
+                        </li>
+                    </ul>
+                </StyledPasswordRequirements> */}
 
                 <div
                     css={{
@@ -244,7 +411,7 @@ export const Login = () => {
                     </Link>
                 </div>
 
-                {isError && globalError ? (
+                {/* {isError && globalError ? (
                     <div
                         css={{
                             color: theme.colors.orangeRed,
@@ -255,7 +422,7 @@ export const Login = () => {
                     >
                         {globalError}
                     </div>
-                ) : null}
+                ) : null} */}
 
                 <div css={{ marginTop: '2rem' }}>
                     <Link

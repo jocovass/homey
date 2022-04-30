@@ -18,10 +18,10 @@ export const theme = {
         lora: ['Lora', 'serif'],
     },
     mq: {
-        laptop: 'only screen and (max-width: 87.5em)', // 1400px
-        'tablet-land': 'only screen and (max-width: 62.5em)', // 1000px
-        tablet: 'only screen and (max-width: 50em)', // 800px
-        mobile: 'only screen and (max-width: 34.5em)', // 550px
+        laptop: 'only screen and (min-width: 87.5em)', // 1400px
+        'tablet-land': 'only screen and (min-width: 62.5em)', // 1000px
+        tablet: 'only screen and (min-width: 50em)', // 800px
+        mobile: 'only screen and (min-width: 34.5em)', // 550px
     },
 };
 

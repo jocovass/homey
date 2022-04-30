@@ -1,18 +1,10 @@
 {
     "extends": "../../tsconfig.settings.json",
     "compilerOptions": {
-        "outDir": "dist/"
-        // "rootDir": "src",
-        // "baseUrl": "./"
+        "outDir": "dist",
+        "baseUrl": "."
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "dist", "__tests__", "coverage"],
-    "references": [
-        {
-            "path": "../web"
-        },
-        {
-            "path": "../common"
-        }
-    ]
+    "references": []
 }

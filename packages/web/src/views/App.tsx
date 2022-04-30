@@ -1,9 +1,8 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Global } from '@emotion/react';
 
 import { globalStyles } from '../styles/theme';
-import { AuthProvider } from '../context/authContext';
+import { UserProvider } from '../context/userContext';
 import { Login } from '../components/Login/Login';
 import { Signup } from '../components/Signup/Signup';
 import { DefaultLayout } from '../layout/Default';
@@ -14,7 +13,7 @@ function App() {
     return (
         <div className="">
             <Global styles={globalStyles} />
-            <AuthProvider>
+            <UserProvider>
                 <Routes>
                     <Route path="/" element={<DefaultLayout />}>
                         <Route path="/" element={<Homepage />} />
@@ -23,7 +22,7 @@ function App() {
                     </Route>
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
-            </AuthProvider>
+            </UserProvider>
         </div>
     );
 }

@@ -94,7 +94,7 @@ type SetErrorAction = {
     type: 'SET_ERROR';
     payload: {
         globalError: string | null;
-        errors: object;
+        errors: { [key: string]: string } | null;
     };
 };
 
@@ -115,10 +115,7 @@ type Dispatch = (action: Actions) => void;
 type State = {
     user: User | null;
     status: 'idle' | 'pending' | 'success' | 'error';
-    errors: {
-        email?: string;
-        password?: string;
-    } | null;
+    errors: { [key: string]: string } | null;
     globalError: string | null;
 };
 type AuthProviderProps = { children: React.ReactNode };
@@ -228,9 +225,9 @@ export const login = async (
                     item: { [key: string]: string },
                 ) => {
                     let keys = Object.keys(item);
-                    if (!acc[keys[0]]) {
-                        acc[keys[0]] = item[keys[0]];
-                    }
+                    // if (!acc[keys[0]]) {
+                    acc[keys[0]] = item[keys[0]];
+                    // }
 
                     return acc;
                 },

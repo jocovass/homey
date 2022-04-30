@@ -1,7 +1,7 @@
-import { useAuth } from '../../context/authContext';
+import { useUser } from '../../context/userContext';
 
 export const Homepage = () => {
-    const { state, dispatch } = useAuth();
+    const { state } = useUser();
     return (
         <>
             <h1>Homepage</h1>

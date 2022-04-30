@@ -8,6 +8,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     /* Allow JS files to be compiled */
     "allowJs": true,
+    "checkJs": false,
     "removeComments": true,
     /* Strict type checking options */
     "strict": true,
@@ -30,11 +31,13 @@
 
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "pretty": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noEmit": false,
+    "incremental": true
   }
 }

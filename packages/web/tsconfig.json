@@ -2,17 +2,10 @@
     "extends": "../../tsconfig.settings.json",
     "compilerOptions": {
         "jsxImportSource": "@emotion/react",
-        "outDir": "dist/",
-        "baseUrl": "./"
+        "outDir": "dist",
+        "baseUrl": "."
     },
     "include": ["src/**/*"],
-    "exclude": ["node_modules"],
-    "references": [
-        {
-            "path": "../server"
-        },
-        {
-            "path": "../common"
-        }
-    ]
+    "exclude": ["node_modules", "dist", "__tests__", "coverage"],
+    "references": []
 }
