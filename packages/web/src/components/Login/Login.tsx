@@ -12,7 +12,6 @@ import * as yup from 'yup';
 
 import { useUser } from '../../context/userContext';
 import { login } from '../../services/authService';
-import { formatServerError } from '../../util/utils';
 import { PrimaryButton } from '../ui/Buttons';
 import { BtnLoader } from '../ui/BtnLoader';
 
@@ -118,12 +117,6 @@ const schema = yup.object({
         .string()
         .required('Password is required.')
         .min(8, 'Must be 8 characters minimum.'),
-    // .required('required')
-    // .min(8, 'minlength')
-    // .matches(RegExp('(.*[a-z].*)'), 'lowercase')
-    // .matches(RegExp('(.*[A-Z].*)'), 'uppercase')
-    // .matches(RegExp('(.*\\d.*)'), 'number')
-    // .matches(RegExp('[!@#$%^&*(),.?":{}|<>]'), 'special'),
 });
 
 interface LoginFormElement extends HTMLFormElement {
@@ -132,8 +125,6 @@ interface LoginFormElement extends HTMLFormElement {
 
 export const Login = () => {
     const theme = useTheme();
-    // const [status, setStatus] = React.useState('idle');
-    // const [error, setError] = React.useState<string | null>(null);
     const [{ status, error }, setState] = React.useState<{
         status: 'idle' | 'pending' | 'success' | 'error';
         error: string | null;
@@ -149,67 +140,61 @@ export const Login = () => {
         register,
         handleSubmit,
         setError: setValidationError,
-        formState: { errors: validationErrors },
+        formState: { errors: validationErrors, touchedFields, isValid },
     } = useForm<IFormInputs>({
-        // resolver: yupResolver(schema, { abortEarly: false }),
-        // mode: 'all',
-        // reValidateMode: 'onChange',
-        // criteriaMode: 'all',
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+        resolver: yupResolver(schema, { abortEarly: false }),
+        mode: 'all',
+        criteriaMode: 'all',
     });
 
     const isLoading = status === 'pending';
-    const success = status === 'success';
+    const isSuccess = status === 'success';
     const isError = status === 'error';
 
     const onSubmit = (data: IFormInputs) => {
+        setState({ status: 'pending', error: null });
         login({
             email: data.email,
             password: data.password,
             dispatch,
-        }).catch((error: any) => {
-            if (typeof error.message === 'string') {
+        })
+            .then(() => setState({ error: null, status: 'success' }))
+            .catch((error: any) => {
+                if (typeof error.message === 'string') {
+                    setState({
+                        status: 'error',
+                        error: error.message,
+                    });
+
+                    return;
+                }
+
+                error.errors.forEach(
+                    (error: { [key: string]: string }, index: number) => {
+                        let keys = Object.keys(error);
+                        setValidationError(
+                            keys[0] as 'email' | 'password',
+                            {
+                                type: 'custom',
+                                message: error[keys[0]],
+                            },
+                            { shouldFocus: index === 0 },
+                        );
+                    },
+                );
+
                 setState({
                     status: 'error',
-                    error: error.message,
+                    error: null,
                 });
-
-                return;
-            }
-
-            let errors = formatServerError(error.errors);
-            let count = 0;
-            for (let key in errors) {
-                setValidationError(
-                    key as 'email' | 'password',
-                    {
-                        type: 'custom',
-                        message: errors[key],
-                    },
-                    { shouldFocus: count === 0 },
-                );
-                count++;
-            }
-        });
+            });
     };
 
-    // const passwordErrors = validationErrors.password?.types
-    //     ? Object.entries(validationErrors.password.types).reduce(
-    //           (acc: string[], rule) => {
-    //               let validateResult = rule[1];
-    //               if (typeof validateResult === 'boolean' || !validateResult)
-    //                   return acc;
-
-    //               if (typeof validateResult === 'string') {
-    //                   return [...acc, validateResult];
-    //               }
-
-    //               return [...acc, ...validateResult];
-    //           },
-    //           [],
-    //       )
-    //     : [];
-
-    if (user) {
+    if (user && isSuccess) {
         return <Navigate to="/" replace />;
     }
 
@@ -239,7 +224,7 @@ export const Login = () => {
                         }}
                     >
                         <label htmlFor="email">Email</label>
-                        {validationErrors?.email ? (
+                        {touchedFields.email && validationErrors?.email ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -251,11 +236,14 @@ export const Login = () => {
                         ) : null}
                     </div>
                     <input
-                        autoComplete="false"
-                        type="email"
+                        className={
+                            touchedFields.email && validationErrors?.email
+                                ? 'error'
+                                : ''
+                        }
                         id="email"
-                        className={validationErrors?.email ? 'error' : ''}
-                        placeholder="test@gmail.com"
+                        placeholder="john@gmail.com"
+                        type="email"
                         {...register('email')}
                     />
                 </div>
@@ -269,7 +257,8 @@ export const Login = () => {
                         }}
                     >
                         <label htmlFor="password">Password</label>
-                        {validationErrors?.password ? (
+                        {touchedFields.password &&
+                        validationErrors?.password ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -281,61 +270,17 @@ export const Login = () => {
                         ) : null}
                     </div>
                     <input
-                        type="password"
+                        className={
+                            touchedFields.password && validationErrors?.password
+                                ? 'error'
+                                : ''
+                        }
                         id="password"
                         placeholder="********"
-                        className={validationErrors?.password ? 'error' : ''}
+                        type="password"
                         {...register('password')}
                     />
                 </div>
-
-                {/* <StyledPasswordRequirements>
-                    <ul>
-                        <li
-                            className={
-                                passwordErrors.includes('lowercase')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One lowercase character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('uppercase')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One uppercase character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('number') ? '' : 'valid'
-                            }
-                        >
-                            One number
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('special')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One special character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('minlength')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            8 characters minimum
-                        </li>
-                    </ul>
-                </StyledPasswordRequirements> */}
 
                 <div
                     css={{
@@ -354,7 +299,7 @@ export const Login = () => {
                                 opacity: '0.5',
                             },
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || !isValid}
                     >
                         Log in
                         {isLoading ? <BtnLoader /> : null}
@@ -404,14 +349,14 @@ export const Login = () => {
                                 opacity: 1,
                             },
                         }}
-                        to="/register"
+                        to="/signup"
                     >
                         <span>Sign up here</span>
                         <GoChevronRight />
                     </Link>
                 </div>
 
-                {/* {isError && globalError ? (
+                {isError ? (
                     <div
                         css={{
                             color: theme.colors.orangeRed,
@@ -420,9 +365,9 @@ export const Login = () => {
                         }}
                         className="error"
                     >
-                        {globalError}
+                        {error}
                     </div>
-                ) : null} */}
+                ) : null}
 
                 <div css={{ marginTop: '2rem' }}>
                     <Link

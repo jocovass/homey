@@ -1,13 +1,32 @@
-export const formatServerError = (errors: { [key: string]: string }[]) =>
-    errors.reduce(
-        (acc: { [key: string]: string }, error: { [key: string]: string }) => {
-            let key = Object.keys(error)[0];
+import { FieldError } from 'react-hook-form';
 
-            if (!acc[key]) {
-                acc[key] = error[key];
-            }
+/**
+ * Used for password inputs
+ * each keyword in the array is a rule the input field faild at, so we can give some visual
+ * feedback for the user
+ * @returns ['required', 'minlength', 'number' ...]
+ */
+export const formatValidationError = (validationErrors: {
+    [key: string]: FieldError | undefined;
+}) => {
+    if (validationErrors?.password?.types) {
+        return Object.entries(validationErrors?.password?.types).reduce(
+            (acc: string[], rule) => {
+                let validateResult = rule[1];
 
-            return acc;
-        },
-        {},
-    );
+                if (typeof validateResult === 'boolean' || !validateResult) {
+                    return acc;
+                }
+
+                if (typeof validateResult === 'string') {
+                    return [...acc, validateResult];
+                }
+
+                return [...acc, ...validateResult];
+            },
+            [],
+        );
+    }
+
+    return [];
+};
