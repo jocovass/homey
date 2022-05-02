@@ -13,8 +13,8 @@ import * as yup from 'yup';
 import { useUser } from '../../context/userContext';
 import { signup } from '../../services/authService';
 import { formatValidationError } from '../../util/utils';
-import { PrimaryButton } from '../ui/Buttons';
-import { BtnLoader } from '../ui/BtnLoader';
+import { PrimaryButton } from '../styled/Buttons';
+import { BtnLoader } from '../styled/BtnLoader';
 
 const StyledSignup = styled.div`
     max-width: 650px;

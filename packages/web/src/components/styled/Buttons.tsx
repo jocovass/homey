@@ -24,4 +24,9 @@ export const PrimaryButton = styled.button<PrimaryButtonProps>`
             0 0 0 0.2em ${props => props.theme.colors.greenAccent};
         outline: 0;
     }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
 `;

@@ -5,7 +5,7 @@ import { jsx, css } from '@emotion/react';
 import { Link, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 
-import { PrimaryButton } from '../ui/Buttons';
+import { PrimaryButton } from '../styled/Buttons';
 
 const StyledHeader = styled.header`
     padding: 1.5rem 5vw;
@@ -98,7 +98,7 @@ export const Header = () => {
     return (
         <StyledHeader>
             <div className="logo">
-                <span>Y</span>
+                <span>H</span>
             </div>
             <nav>
                 <ul>
