@@ -11,7 +11,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { useUser } from '../../context/userContext';
-import { login } from '../../services/authService';
+import { signup } from '../../services/authService';
 import { formatValidationError } from '../../util/utils';
 import { PrimaryButton } from '../ui/Buttons';
 import { BtnLoader } from '../ui/BtnLoader';
@@ -108,6 +108,8 @@ interface IFormInputs {
 }
 
 const schema = yup.object({
+    firstName: yup.string().required('First name is required.'),
+    lastName: yup.string().required('Last name is required.'),
     email: yup
         .string()
         .required('Email is required.')
@@ -120,6 +122,10 @@ const schema = yup.object({
         .matches(RegExp('(.*[A-Z].*)'), 'uppercase')
         .matches(RegExp('(.*\\d.*)'), 'number')
         .matches(RegExp('[!@#$%^&*(),.?":{}|<>]'), 'special'),
+    passwordConfirm: yup
+        .string()
+        .required('Password confirmation is required.')
+        .oneOf([yup.ref('password')], 'Password must match.'),
 });
 
 export const Signup = () => {
@@ -139,7 +145,7 @@ export const Signup = () => {
         register,
         handleSubmit,
         setError: setValidationError,
-        formState: { errors: validationErrors, isDirty },
+        formState: { errors: validationErrors, isValid, touchedFields },
     } = useForm<IFormInputs>({
         defaultValues: {
             firstName: '',
@@ -149,8 +155,7 @@ export const Signup = () => {
             passwordConfirm: '',
         },
         resolver: yupResolver(schema, { abortEarly: false }),
-        mode: 'onBlur',
-        reValidateMode: 'onChange',
+        mode: 'all',
         criteriaMode: 'all',
     });
 
@@ -160,9 +165,12 @@ export const Signup = () => {
 
     const onSubmit = (data: IFormInputs) => {
         setState({ status: 'pending', error: null });
-        login({
+        signup({
+            firstName: data.firstName,
+            lastName: data.lastName,
             email: data.email,
             password: data.password,
+            passwordConfirm: data.passwordConfirm,
             dispatch,
         })
             .then(() => setState({ error: null, status: 'success' }))
@@ -180,7 +188,7 @@ export const Signup = () => {
                     (error: { [key: string]: string }, index: number) => {
                         let keys = Object.keys(error);
                         setValidationError(
-                            keys[0] as 'email' | 'password',
+                            keys[0] as keyof IFormInputs,
                             {
                                 type: 'custom',
                                 message: error[keys[0]],
@@ -218,8 +226,6 @@ export const Signup = () => {
                 </p>
             </div>
 
-            <pre>isDirty: {isDirty ? 'yes' : 'no'}</pre>
-
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <div
@@ -230,7 +236,8 @@ export const Signup = () => {
                         }}
                     >
                         <label htmlFor="firstName">First name</label>
-                        {validationErrors?.firstName ? (
+                        {touchedFields.firstName &&
+                        validationErrors.firstName ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -245,8 +252,13 @@ export const Signup = () => {
                         autoComplete="false"
                         type="text"
                         id="firstName"
-                        className={validationErrors?.firstName ? 'error' : ''}
-                        placeholder="Jhon"
+                        className={
+                            touchedFields.firstName &&
+                            validationErrors.firstName
+                                ? 'error'
+                                : ''
+                        }
+                        placeholder="John"
                         {...register('firstName')}
                     />
                 </div>
@@ -260,7 +272,7 @@ export const Signup = () => {
                         }}
                     >
                         <label htmlFor="lastName">Last name</label>
-                        {validationErrors?.lastName ? (
+                        {touchedFields.lastName && validationErrors.lastName ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -275,8 +287,12 @@ export const Signup = () => {
                         autoComplete="false"
                         type="text"
                         id="lastName"
-                        className={validationErrors?.lastName ? 'error' : ''}
-                        placeholder="Jhon"
+                        className={
+                            touchedFields.lastName && validationErrors.lastName
+                                ? 'error'
+                                : ''
+                        }
+                        placeholder="Smith"
                         {...register('lastName')}
                     />
                 </div>
@@ -290,7 +306,7 @@ export const Signup = () => {
                         }}
                     >
                         <label htmlFor="email">Email</label>
-                        {validationErrors?.email ? (
+                        {touchedFields.email && validationErrors.email ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -305,88 +321,82 @@ export const Signup = () => {
                         autoComplete="false"
                         type="email"
                         id="email"
-                        className={validationErrors?.email ? 'error' : ''}
-                        placeholder="test@gmail.com"
+                        className={
+                            touchedFields.email && validationErrors.email
+                                ? 'error'
+                                : ''
+                        }
+                        placeholder="john@gmail.com"
                         {...register('email')}
                     />
                 </div>
 
                 <div>
-                    <div
-                        css={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <label htmlFor="password">Password</label>
-                        {validationErrors?.password ? (
-                            <p
-                                css={{
-                                    color: theme.colors.orangeRed,
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                {validationErrors.password.message}
-                            </p>
-                        ) : null}
-                    </div>
+                    <label htmlFor="password">Password</label>
                     <input
                         type="password"
                         id="password"
                         placeholder="********"
-                        className={validationErrors?.password ? 'error' : ''}
+                        className={
+                            touchedFields.password && validationErrors.password
+                                ? 'error'
+                                : ''
+                        }
                         {...register('password')}
                     />
                 </div>
 
-                <StyledPasswordRequirements>
-                    <ul>
-                        <li
-                            className={
-                                passwordErrors.includes('lowercase')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One lowercase character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('uppercase')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One uppercase character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('number') ? '' : 'valid'
-                            }
-                        >
-                            One number
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('special')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            One special character
-                        </li>
-                        <li
-                            className={
-                                passwordErrors.includes('minlength')
-                                    ? ''
-                                    : 'valid'
-                            }
-                        >
-                            8 characters minimum
-                        </li>
-                    </ul>
-                </StyledPasswordRequirements>
+                {touchedFields.password ? (
+                    <StyledPasswordRequirements>
+                        <ul>
+                            <li
+                                className={
+                                    passwordErrors.includes('lowercase')
+                                        ? ''
+                                        : 'valid'
+                                }
+                            >
+                                One lowercase character
+                            </li>
+                            <li
+                                className={
+                                    passwordErrors.includes('uppercase')
+                                        ? ''
+                                        : 'valid'
+                                }
+                            >
+                                One uppercase character
+                            </li>
+                            <li
+                                className={
+                                    passwordErrors.includes('number')
+                                        ? ''
+                                        : 'valid'
+                                }
+                            >
+                                One number
+                            </li>
+                            <li
+                                className={
+                                    passwordErrors.includes('special')
+                                        ? ''
+                                        : 'valid'
+                                }
+                            >
+                                One special character
+                            </li>
+                            <li
+                                className={
+                                    passwordErrors.includes('minlength')
+                                        ? ''
+                                        : 'valid'
+                                }
+                            >
+                                8 characters minimum
+                            </li>
+                        </ul>
+                    </StyledPasswordRequirements>
+                ) : null}
 
                 <div>
                     <div
@@ -399,7 +409,8 @@ export const Signup = () => {
                         <label htmlFor="passwordConfirm">
                             Confirm Password
                         </label>
-                        {validationErrors?.passwordConfirm ? (
+                        {touchedFields.passwordConfirm &&
+                        validationErrors.passwordConfirm ? (
                             <p
                                 css={{
                                     color: theme.colors.orangeRed,
@@ -415,7 +426,10 @@ export const Signup = () => {
                         id="passwordConfirm"
                         placeholder="********"
                         className={
-                            validationErrors?.passwordConfirm ? 'error' : ''
+                            touchedFields.passwordConfirm &&
+                            validationErrors.passwordConfirm
+                                ? 'error'
+                                : ''
                         }
                         {...register('passwordConfirm')}
                     />
@@ -438,7 +452,7 @@ export const Signup = () => {
                                 opacity: '0.5',
                             },
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || !isValid}
                     >
                         Sign up
                         {isLoading ? <BtnLoader /> : null}
