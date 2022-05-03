@@ -5,6 +5,8 @@ import { jsx, css } from '@emotion/react';
 import { Link, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 
+import { logout } from '../../services/authService';
+import { useUser } from '../../context/userContext';
 import { PrimaryButton } from '../styled/Buttons';
 
 const StyledHeader = styled.header`
@@ -95,6 +97,15 @@ const StyledHeader = styled.header`
 `;
 
 export const Header = () => {
+    const {
+        state: { user },
+        dispatch,
+    } = useUser();
+
+    const handleLogout = () => {
+        logout({ dispatch });
+    };
+
     return (
         <StyledHeader>
             <div className="logo">
@@ -113,13 +124,22 @@ export const Header = () => {
                         </NavLink>
                     </li>
                 </ul>
-                <PrimaryButton
-                    css={{ marginLeft: '2rem' }}
-                    as={Link}
-                    to="/login"
-                >
-                    Log in / Sign up
-                </PrimaryButton>
+                {user ? (
+                    <PrimaryButton
+                        css={{ marginLeft: '2rem' }}
+                        onClick={handleLogout}
+                    >
+                        Log out
+                    </PrimaryButton>
+                ) : (
+                    <PrimaryButton
+                        css={{ marginLeft: '2rem' }}
+                        as={Link}
+                        to="/login"
+                    >
+                        Log in / Sign up
+                    </PrimaryButton>
+                )}
             </nav>
         </StyledHeader>
     );

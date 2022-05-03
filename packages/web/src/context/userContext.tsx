@@ -39,7 +39,7 @@ type User = {
 type SetUserAction = {
     type: 'SET_USER';
     payload: {
-        user: User;
+        user: User | null;
     };
 };
 

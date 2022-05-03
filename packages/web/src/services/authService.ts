@@ -25,7 +25,7 @@ export const login = async ({
 
         return data;
     } catch (error: any) {
-        throw error.response.data;
+        return Promise.reject(error.response.data);
     }
 };
 
@@ -62,6 +62,21 @@ export const signup = async ({
 
         return data;
     } catch (error: any) {
-        throw error.response.data;
+        return Promise.reject(error.response.data);
+    }
+};
+
+export const logout = async ({
+    dispatch,
+}: {
+    dispatch: Dispatch;
+}): Promise<void> => {
+    try {
+        await axios.post(`/users/logout`);
+        dispatch({ type: 'SET_USER', payload: { user: null } });
+        return;
+    } catch (error: any) {
+        console.log(error.response);
+        return;
     }
 };
