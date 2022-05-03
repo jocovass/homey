@@ -1,8 +1,7 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 // eslint-disable-next-line no-unused-vars
-import { jsx, css, useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { jsx, css } from '@emotion/react';
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
@@ -13,99 +12,23 @@ import * as yup from 'yup';
 import { useUser } from '../../context/userContext';
 import { signup } from '../../services/authService';
 import { formatValidationError } from '../../util/utils';
+import {
+    FieldGroup,
+    FieldGroupInput,
+    FieldGroupLabel,
+    FieldGroupValidationGuide,
+} from '../atoms/form';
+import { AuthForm } from '../styled/AuthForm';
 import { PrimaryButton } from '../styled/Buttons';
 import { BtnLoader } from '../styled/BtnLoader';
 
-const StyledSignup = styled.div`
-    max-width: 650px;
-    padding: 0 5vw;
-    margin: 1.5rem auto 3rem;
-
-    h1 {
-        color: ${props => props.theme.colors.greenDark};
-        font-size: 2.45rem;
-        font-weight: 500;
-        margin-bottom: 0.6rem;
-    }
-
-    label {
-        display: block;
-        font-size: 1.6rem;
-        margin-bottom: 0.85rem;
-    }
-
-    input {
-        width: 100%;
-        min-height: 5.5rem;
-        margin-bottom: 2rem;
-        padding: 1.2rem;
-        border-radius: 7px;
-        border: 0;
-        outline: 0;
-        background-color: ${props => props.theme.colors.greenLight};
-        font-size: 1.5rem;
-        color: ${props => props.theme.colors.greenBlack};
-        display: block;
-        position: relative;
-        transition-property: box-shadow;
-        transition-duration: 300ms;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-
-        &::placeholder {
-            color: ${props => props.theme.colors.greenGrey};
-        }
-
-        &:hover,
-        &:focus {
-            box-shadow: ${props =>
-                `0 0 0 2px ${props.theme.colors.greenLighter}, 0 0 0 4px ${props.theme.colors.greenAccent}`};
-        }
-
-        &.error:hover,
-        &.error:focus {
-            box-shadow: ${props =>
-                `0 0 0 2px ${props.theme.colors.greenLighter}, 0 0 0 4px ${props.theme.colors.orangeRed}`};
-        }
-    }
-`;
-
-const StyledPasswordRequirements = styled.div`
-    font-size: 1.3rem;
-    color: #949494;
-    margin-bottom: 2rem;
-
-    &.error {
-        color: ${props => props.theme.colors.orangeRed};
-    }
-
-    ul {
-        display: flex;
-        flex-wrap: wrap;
-        padding-left: 1rem;
-    }
-
-    li {
-        flex-basis: 100%;
-        list-style-type: none;
-        margin-bottom: 0.3rem;
-
-        &.valid {
-            color: ${props => props.theme.colors.greenAccent};
-        }
-
-        @media ${props => props.theme.mq.mobile} {
-            flex-basis: 40%;
-        }
-    }
-`;
-
-interface IFormInputs {
+type SignupFormFields = {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
     passwordConfirm: string;
-}
+};
 
 const schema = yup.object({
     firstName: yup.string().required('First name is required.'),
@@ -128,8 +51,15 @@ const schema = yup.object({
         .oneOf([yup.ref('password')], 'Password must match.'),
 });
 
+const validationList = [
+    'One lowercase character',
+    'One uppercase character',
+    'One number',
+    'One special character',
+    '8 characters minimum',
+];
+
 export const Signup = () => {
-    const theme = useTheme();
     const [{ status, error }, setState] = React.useState<{
         status: 'idle' | 'pending' | 'success' | 'error';
         error: string | null;
@@ -146,7 +76,7 @@ export const Signup = () => {
         handleSubmit,
         setError: setValidationError,
         formState: { errors: validationErrors, isValid, touchedFields },
-    } = useForm<IFormInputs>({
+    } = useForm<SignupFormFields>({
         defaultValues: {
             firstName: '',
             lastName: '',
@@ -160,10 +90,9 @@ export const Signup = () => {
     });
 
     const isLoading = status === 'pending';
-    const isSuccess = status === 'success';
     const isError = status === 'error';
 
-    const onSubmit = (data: IFormInputs) => {
+    const onSubmit = (data: SignupFormFields) => {
         setState({ status: 'pending', error: null });
         signup({
             firstName: data.firstName,
@@ -188,7 +117,7 @@ export const Signup = () => {
                     (error: { [key: string]: string }, index: number) => {
                         let keys = Object.keys(error);
                         setValidationError(
-                            keys[0] as keyof IFormInputs,
+                            keys[0] as keyof SignupFormFields,
                             {
                                 type: 'custom',
                                 message: error[keys[0]],
@@ -207,250 +136,149 @@ export const Signup = () => {
 
     const passwordErrors = formatValidationError(validationErrors);
 
-    if (user && isSuccess) {
+    if (user) {
         return <Navigate to="/" replace />;
     }
 
     return (
-        <StyledSignup>
-            <div css={{ textAlign: 'center' }}>
-                <h1>Sign up</h1>
-                <p
-                    css={{
-                        fontSize: '1.4rem',
-                        marginBottom: '3.5rem',
-                        color: theme.colors.greenGrey,
-                    }}
-                >
+        <AuthForm>
+            <div className="header">
+                <h1 className="title">Sign up</h1>
+                <p className="subtitle">
                     Welcome, sign up and join a household or create your own.
                 </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <div
-                        css={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <label htmlFor="firstName">First name</label>
-                        {touchedFields.firstName &&
-                        validationErrors.firstName ? (
-                            <p
-                                css={{
-                                    color: theme.colors.orangeRed,
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                {validationErrors.firstName.message}
-                            </p>
-                        ) : null}
-                    </div>
-                    <input
-                        autoComplete="false"
-                        type="text"
-                        id="firstName"
+                <FieldGroup>
+                    <FieldGroupLabel<SignupFormFields>
+                        label="First name"
+                        htmlFor="firstName"
+                        name="firstName"
+                        validationErrors={validationErrors}
+                        touchedFields={touchedFields}
+                    />
+
+                    <FieldGroupInput<SignupFormFields>
                         className={
                             touchedFields.firstName &&
                             validationErrors.firstName
                                 ? 'error'
                                 : ''
                         }
-                        placeholder="John"
-                        {...register('firstName')}
-                    />
-                </div>
-
-                <div>
-                    <div
-                        css={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <label htmlFor="lastName">Last name</label>
-                        {touchedFields.lastName && validationErrors.lastName ? (
-                            <p
-                                css={{
-                                    color: theme.colors.orangeRed,
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                {validationErrors.lastName.message}
-                            </p>
-                        ) : null}
-                    </div>
-                    <input
-                        autoComplete="false"
+                        id="firstName"
+                        name="firstName"
                         type="text"
-                        id="lastName"
+                        placeholder="John"
+                        register={register}
+                    />
+                </FieldGroup>
+
+                <FieldGroup>
+                    <FieldGroupLabel<SignupFormFields>
+                        label="Last name"
+                        htmlFor="lastName"
+                        name="lastName"
+                        validationErrors={validationErrors}
+                        touchedFields={touchedFields}
+                    />
+
+                    <FieldGroupInput<SignupFormFields>
                         className={
                             touchedFields.lastName && validationErrors.lastName
                                 ? 'error'
                                 : ''
                         }
+                        id="lastName"
+                        name="lastName"
+                        type="text"
                         placeholder="Smith"
-                        {...register('lastName')}
+                        register={register}
                     />
-                </div>
+                </FieldGroup>
 
-                <div>
-                    <div
-                        css={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <label htmlFor="email">Email</label>
-                        {touchedFields.email && validationErrors.email ? (
-                            <p
-                                css={{
-                                    color: theme.colors.orangeRed,
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                {validationErrors.email.message}
-                            </p>
-                        ) : null}
-                    </div>
-                    <input
-                        autoComplete="false"
-                        type="email"
-                        id="email"
+                <FieldGroup>
+                    <FieldGroupLabel<SignupFormFields>
+                        label="Email"
+                        htmlFor="email"
+                        name="email"
+                        validationErrors={validationErrors}
+                        touchedFields={touchedFields}
+                    />
+
+                    <FieldGroupInput<SignupFormFields>
                         className={
                             touchedFields.email && validationErrors.email
                                 ? 'error'
                                 : ''
                         }
+                        id="email"
+                        name="email"
+                        type="email"
                         placeholder="john@gmail.com"
-                        {...register('email')}
+                        register={register}
                     />
-                </div>
+                </FieldGroup>
 
-                <div>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="********"
+                <FieldGroup>
+                    <FieldGroupLabel<SignupFormFields>
+                        label="Password"
+                        htmlFor="password"
+                        name="password"
+                        validationErrors={validationErrors}
+                        touchedFields={touchedFields}
+                    />
+
+                    <FieldGroupInput<SignupFormFields>
                         className={
                             touchedFields.password && validationErrors.password
                                 ? 'error'
                                 : ''
                         }
-                        {...register('password')}
-                    />
-                </div>
-
-                {touchedFields.password ? (
-                    <StyledPasswordRequirements>
-                        <ul>
-                            <li
-                                className={
-                                    passwordErrors.includes('lowercase')
-                                        ? ''
-                                        : 'valid'
-                                }
-                            >
-                                One lowercase character
-                            </li>
-                            <li
-                                className={
-                                    passwordErrors.includes('uppercase')
-                                        ? ''
-                                        : 'valid'
-                                }
-                            >
-                                One uppercase character
-                            </li>
-                            <li
-                                className={
-                                    passwordErrors.includes('number')
-                                        ? ''
-                                        : 'valid'
-                                }
-                            >
-                                One number
-                            </li>
-                            <li
-                                className={
-                                    passwordErrors.includes('special')
-                                        ? ''
-                                        : 'valid'
-                                }
-                            >
-                                One special character
-                            </li>
-                            <li
-                                className={
-                                    passwordErrors.includes('minlength')
-                                        ? ''
-                                        : 'valid'
-                                }
-                            >
-                                8 characters minimum
-                            </li>
-                        </ul>
-                    </StyledPasswordRequirements>
-                ) : null}
-
-                <div>
-                    <div
-                        css={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <label htmlFor="passwordConfirm">
-                            Confirm Password
-                        </label>
-                        {touchedFields.passwordConfirm &&
-                        validationErrors.passwordConfirm ? (
-                            <p
-                                css={{
-                                    color: theme.colors.orangeRed,
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                {validationErrors.passwordConfirm.message}
-                            </p>
-                        ) : null}
-                    </div>
-                    <input
+                        id="password"
+                        name="password"
                         type="password"
-                        id="passwordConfirm"
-                        placeholder="********"
+                        placeholder="*********"
+                        register={register}
+                    />
+
+                    {touchedFields.password ? (
+                        <FieldGroupValidationGuide
+                            validationErrors={passwordErrors}
+                            validationList={validationList}
+                        />
+                    ) : null}
+                </FieldGroup>
+
+                <FieldGroup>
+                    <FieldGroupLabel<SignupFormFields>
+                        label="Confirm Password"
+                        htmlFor="passwordConfirm"
+                        name="passwordConfirm"
+                        validationErrors={validationErrors}
+                        touchedFields={touchedFields}
+                    />
+
+                    <FieldGroupInput<SignupFormFields>
                         className={
                             touchedFields.passwordConfirm &&
                             validationErrors.passwordConfirm
                                 ? 'error'
                                 : ''
                         }
-                        {...register('passwordConfirm')}
+                        id="passwordConfirm"
+                        name="passwordConfirm"
+                        type="password"
+                        placeholder="*********"
+                        register={register}
                     />
-                </div>
+                </FieldGroup>
 
-                <div
-                    css={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                    }}
-                >
+                <div className="flex">
                     <PrimaryButton
                         css={{
                             padding: '.9em',
                             width: '15rem',
-
-                            '&:disabled': {
-                                cursor: 'not-allowed',
-                                opacity: '0.5',
-                            },
                         }}
                         disabled={isLoading || !isValid}
                     >
@@ -458,70 +286,16 @@ export const Signup = () => {
                         {isLoading ? <BtnLoader /> : null}
                     </PrimaryButton>
 
-                    <span
-                        css={{
-                            fontSize: '2rem',
-                            textTransform: 'uppercase',
-                            color: theme.colors.greenGrey,
-                        }}
-                    >
-                        or
-                    </span>
+                    <span className="or">or</span>
 
-                    <Link
-                        css={{
-                            color: theme.colors.greenDark,
-                            fontSize: '1.2rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            textDecoration: 'none',
-
-                            span: {
-                                transform: 'translateX(0)',
-                                transitionProperty: 'transform',
-                                transitionDuration: '300ms',
-                                transitionTimingFunction:
-                                    'cubic-bezier(0.4, 0, 0.2, 1)',
-                            },
-
-                            svg: {
-                                transform: 'scale(0) translateX(20px)',
-                                opacity: 0,
-                                transitionProperty: 'transform opacity',
-                                transitionDuration: '300ms',
-                                transitionTimingFunction:
-                                    'cubic-bezier(0.4, 0, 0.2, 1)',
-                            },
-
-                            '&:hover span': {
-                                transform: 'translateX(-2px)',
-                            },
-
-                            '&:hover svg': {
-                                transform: 'scale(1) translateX(0px)',
-                                opacity: 1,
-                            },
-                        }}
-                        to="/login"
-                    >
+                    <Link className="link-to-form" to="/login">
                         <span>Log in here</span>
                         <GoChevronRight />
                     </Link>
                 </div>
 
-                {isError ? (
-                    <div
-                        css={{
-                            color: theme.colors.orangeRed,
-                            fontSize: '1.4rem',
-                            marginTop: '1rem',
-                        }}
-                        className="error"
-                    >
-                        {error}
-                    </div>
-                ) : null}
+                {isError ? <div className="form-error">{error}</div> : null}
             </form>
-        </StyledSignup>
+        </AuthForm>
     );
 };

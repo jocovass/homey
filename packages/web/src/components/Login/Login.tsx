@@ -69,7 +69,6 @@ export const Login = () => {
     });
 
     const isLoading = status === 'pending';
-    const isSuccess = status === 'success';
     const isError = status === 'error';
 
     const onSubmit = (data: LoginFormFields) => {
