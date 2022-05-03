@@ -39,8 +39,8 @@ type LabelProps = LabelHTMLAttributes<HTMLLabelElement>;
 type FieldGroupLabelProps<FormValues> = {
     label: string;
     name: string;
-    validationErrors: Partial<DeepMap<FormValues, FieldError>>;
-    touchedFields: Partial<DeepMap<FormValues, boolean | undefined>>;
+    validationErrors?: Partial<DeepMap<FormValues, FieldError>>;
+    touchedFields?: Partial<DeepMap<FormValues, boolean | undefined>>;
 } & LabelProps;
 export const FieldGroupLabel = <FormValues extends Record<string, unknown>>({
     label,
@@ -52,7 +52,10 @@ export const FieldGroupLabel = <FormValues extends Record<string, unknown>>({
     return (
         <StyledFieldGroupLabel>
             <label {...rest}>{label}</label>
-            {touchedFields[name] && validationErrors[name] ? (
+            {touchedFields &&
+            touchedFields[name] &&
+            validationErrors &&
+            validationErrors[name] ? (
                 <p className="error">{validationErrors[name]?.message}</p>
             ) : null}
         </StyledFieldGroupLabel>
@@ -154,18 +157,20 @@ export const FieldGroupValidationGuide: React.FC<
 > = ({ validationList, validationErrors }) => {
     return (
         <StyledFieldGroupValidationGuide>
-            {validationList.map((item, index) => {
-                return (
-                    <li
-                        className={
-                            validationErrors.includes(item) ? '' : 'valid'
-                        }
-                        key={index}
-                    >
-                        {item}
-                    </li>
-                );
-            })}
+            <ul>
+                {validationList.map((item, index) => {
+                    return (
+                        <li
+                            className={
+                                validationErrors.includes(item) ? '' : 'valid'
+                            }
+                            key={index}
+                        >
+                            {item}
+                        </li>
+                    );
+                })}
+            </ul>
         </StyledFieldGroupValidationGuide>
     );
 };

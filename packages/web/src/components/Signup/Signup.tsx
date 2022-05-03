@@ -7,10 +7,10 @@ import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 
 import { useUser } from '../../context/userContext';
 import { signup } from '../../services/authService';
+import { signupSchema, passwordValidationList } from '../../util/validations';
 import { formatValidationError } from '../../util/utils';
 import {
     FieldGroup,
@@ -30,35 +30,6 @@ type SignupFormFields = {
     passwordConfirm: string;
 };
 
-const schema = yup.object({
-    firstName: yup.string().required('First name is required.'),
-    lastName: yup.string().required('Last name is required.'),
-    email: yup
-        .string()
-        .required('Email is required.')
-        .email('Invalid email address.'),
-    password: yup
-        .string()
-        .required('required')
-        .min(8, 'minlength')
-        .matches(RegExp('(.*[a-z].*)'), 'lowercase')
-        .matches(RegExp('(.*[A-Z].*)'), 'uppercase')
-        .matches(RegExp('(.*\\d.*)'), 'number')
-        .matches(RegExp('[!@#$%^&*(),.?":{}|<>]'), 'special'),
-    passwordConfirm: yup
-        .string()
-        .required('Password confirmation is required.')
-        .oneOf([yup.ref('password')], 'Password must match.'),
-});
-
-const validationList = [
-    'One lowercase character',
-    'One uppercase character',
-    'One number',
-    'One special character',
-    '8 characters minimum',
-];
-
 export const Signup = () => {
     const [{ status, error }, setState] = React.useState<{
         status: 'idle' | 'pending' | 'success' | 'error';
@@ -75,7 +46,12 @@ export const Signup = () => {
         register,
         handleSubmit,
         setError: setValidationError,
-        formState: { errors: validationErrors, isValid, touchedFields },
+        formState: {
+            errors: validationErrors,
+            isValid,
+            touchedFields,
+            dirtyFields,
+        },
     } = useForm<SignupFormFields>({
         defaultValues: {
             firstName: '',
@@ -84,7 +60,7 @@ export const Signup = () => {
             password: '',
             passwordConfirm: '',
         },
-        resolver: yupResolver(schema, { abortEarly: false }),
+        resolver: yupResolver(signupSchema, { abortEarly: false }),
         mode: 'all',
         criteriaMode: 'all',
     });
@@ -225,8 +201,6 @@ export const Signup = () => {
                         label="Password"
                         htmlFor="password"
                         name="password"
-                        validationErrors={validationErrors}
-                        touchedFields={touchedFields}
                     />
 
                     <FieldGroupInput<SignupFormFields>
@@ -242,10 +216,10 @@ export const Signup = () => {
                         register={register}
                     />
 
-                    {touchedFields.password ? (
+                    {touchedFields.password || dirtyFields.password ? (
                         <FieldGroupValidationGuide
                             validationErrors={passwordErrors}
-                            validationList={validationList}
+                            validationList={passwordValidationList}
                         />
                     ) : null}
                 </FieldGroup>

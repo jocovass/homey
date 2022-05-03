@@ -7,10 +7,10 @@ import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 
 import { useUser } from '../../context/userContext';
 import { login } from '../../services/authService';
+import { loginSchema } from '../../util/validations';
 import { FieldGroup, FieldGroupInput, FieldGroupLabel } from '../atoms/form';
 import { AuthForm } from '../styled/AuthForm';
 import { PrimaryButton } from '../styled/Buttons';
@@ -29,17 +29,6 @@ type LoginFormFields = {
     email: string;
     password: string;
 };
-
-const schema = yup.object({
-    email: yup
-        .string()
-        .required('Email is required.')
-        .email('Invalid email address.'),
-    password: yup
-        .string()
-        .required('Password is required.')
-        .min(8, 'Must be 8 characters minimum.'),
-});
 
 export const Login = () => {
     const [{ status, error }, setState] = React.useState<{
@@ -63,7 +52,7 @@ export const Login = () => {
             email: '',
             password: '',
         },
-        resolver: yupResolver(schema, { abortEarly: false }),
+        resolver: yupResolver(loginSchema, { abortEarly: false }),
         mode: 'all',
         criteriaMode: 'all',
     });

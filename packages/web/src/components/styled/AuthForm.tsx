@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 export const AuthForm = styled.div`
     max-width: 650px;
     padding: 0 5vw;
-    margin: 1.5rem auto 0;
+    margin: 1.5rem auto 4rem;
 
     .header {
         text-align: center;
