@@ -6,8 +6,9 @@ import { UserProvider } from '../context/userContext';
 import { Login } from '../components/Login/Login';
 import { Signup } from '../components/Signup/Signup';
 import { DefaultLayout } from '../layout/Default';
-import { Dashboard } from './Dashboard/Dashboard';
+import { DashboardLayout } from '../layout/Dashboard';
 import { Homepage } from './Homepage/Homepage';
+import { Dashboard } from './Dashboard/Dashboard';
 
 function App() {
     return (
@@ -16,11 +17,13 @@ function App() {
             <UserProvider>
                 <Routes>
                     <Route path="/" element={<DefaultLayout />}>
-                        <Route path="/" element={<Homepage />} />
+                        <Route index element={<Homepage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
                     </Route>
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="dashboard" element={<DashboardLayout />}>
+                        <Route index element={<Dashboard />} />
+                    </Route>
                 </Routes>
             </UserProvider>
         </div>
