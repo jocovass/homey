@@ -2,7 +2,8 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from '@emotion/styled';
 
-import { Header } from '../components/Headers/DahboardHeader';
+import { Header } from '../components/Header/Header';
+import { DashboardNav } from '../components/Navigation/DashboardNav';
 
 const StyledSideModal = styled.aside`
     background-color: #fff;
@@ -22,7 +23,9 @@ const StyledDashboard = styled.div`
 export const DashboardLayout: React.FC = ({ children }) => {
     return (
         <StyledDashboard>
-            <Header />
+            <Header>
+                <DashboardNav />
+            </Header>
             <StyledSideModal>SIDE MODAL</StyledSideModal>
             {children ? children : <Outlet />}
         </StyledDashboard>
