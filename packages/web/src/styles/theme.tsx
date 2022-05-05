@@ -11,6 +11,9 @@ export const theme = {
         orange: '#FB9119',
         orangeRed: '#C05E3D',
         blue: '#6398DE',
+        black: '#040404',
+        grey: '#777777',
+        greyLight: '#efefef',
     },
     fontFamily: {
         playfair: ['"Playfair Display"', 'serif'],
@@ -75,6 +78,43 @@ export const globalStyles = css`
         cursor: pointer;
         border: none;
         outline: none;
-        font-family: 'Merriweather', sans-serif;
+        font-family: ${theme.fontFamily.lora};
+        padding: 0.3rem;
+
+        &:focus-visible {
+            outline-color: ${theme.colors.greenAccent};
+            outline-width: 2px;
+            outline-style: solid;
+        }
+    }
+
+    ///////////////////////////////
+    // global mixins
+    @mixin hover {
+        transition-property: box-shadow;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover,
+        &:focus,
+        &:focus-visible {
+            box-shadow: 0 0 0 0.1em ${theme.colors.greenLighter},
+                0 0 0 0.2em ${theme.colors.greenAccent};
+            outline: 0;
+        }
+    }
+`;
+
+export const hoverEffect = css`
+    transition-property: box-shadow;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover,
+    &:focus,
+    &:focus-visible {
+        box-shadow: 0 0 0 0.1em ${theme.colors.greenLighter},
+            0 0 0 0.2em ${theme.colors.greenAccent};
+        outline: 0;
     }
 `;

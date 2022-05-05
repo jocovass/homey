@@ -4,16 +4,7 @@ import styled from '@emotion/styled';
 
 import { Header } from '../components/Header/Header';
 import { DashboardNav } from '../components/Navigation/DashboardNav';
-
-const StyledSideModal = styled.aside`
-    background-color: #fff;
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 33vw;
-    height: 100vh;
-    max-width: 500px;
-`;
+import { SideModal } from '../components/SideModal/SideModal';
 
 const StyledDashboard = styled.div`
     margin-right: clamp(0px, 30vw, 450px);
@@ -26,7 +17,7 @@ export const DashboardLayout: React.FC = ({ children }) => {
             <Header>
                 <DashboardNav />
             </Header>
-            <StyledSideModal>SIDE MODAL</StyledSideModal>
+            <SideModal />
             {children ? children : <Outlet />}
         </StyledDashboard>
     );

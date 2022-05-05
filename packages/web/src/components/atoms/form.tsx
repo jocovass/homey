@@ -1,7 +1,7 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 // eslint-disable-next-line no-unused-vars
-import { jsx, css, useTheme } from '@emotion/react';
+import { jsx, css } from '@emotion/react';
 import React, { InputHTMLAttributes, LabelHTMLAttributes } from 'react';
 import styled from '@emotion/styled';
 import { UseFormRegister, Path, DeepMap, FieldError } from 'react-hook-form';

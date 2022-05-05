@@ -50,5 +50,9 @@ export const StyledNav = styled.nav`
         &.active::after {
             transform: translateX(-50%) scaleX(1);
         }
+
+        &:focus-visible {
+            outline-color: ${props => props.theme.colors.greenAccent};
+        }
     }
 `;
