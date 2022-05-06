@@ -70,7 +70,19 @@ export const globalStyles = css`
     h5,
     h6 {
         font-family: ${theme.fontFamily.playfair};
-        color: ${theme.colors.blue};
+        color: ${theme.colors.greenBlack};
+    }
+
+    h1 {
+        font-size: 2.45rem;
+        font-weight: 500;
+        margin-bottom: 0.6rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: 0.6rem;
     }
 
     button {

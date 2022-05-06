@@ -9,6 +9,7 @@ import { DefaultLayout } from '../layout/Default';
 import { DashboardLayout } from '../layout/Dashboard';
 import { Homepage } from './Homepage/Homepage';
 import { Dashboard } from './Dashboard/Dashboard';
+import { UserSettings } from './UserSettings/UserSettings';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                     </Route>
                     <Route path="dashboard" element={<DashboardLayout />}>
                         <Route index element={<Dashboard />} />
+                        <Route path="settings/*" element={<UserSettings />} />
                     </Route>
                 </Routes>
             </UserProvider>

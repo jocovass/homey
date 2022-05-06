@@ -7,7 +7,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { GoChevronRight } from 'react-icons/go';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-
+// RiArrowRightSLine
 import { useUser } from '../../context/userContext';
 import { signup } from '../../services/authService';
 import { signupSchema, passwordValidationList } from '../../util/validations';

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { RiLogoutBoxLine } from 'react-icons/ri';
 
@@ -7,7 +8,7 @@ const StyledSideModal = styled.aside`
     position: fixed;
     top: 0;
     right: 0;
-    width: 33vw;
+    width: 32vw;
     height: 100vh;
     max-width: 500px;
     padding: 1.5rem;
@@ -40,6 +41,7 @@ const StyledSideModal = styled.aside`
     .user {
         display: flex;
         align-items: center;
+        text-decoration: none;
 
         &__details {
             margin-right: 0.8rem;
@@ -82,7 +84,8 @@ export const SideModal = () => {
                     <RiLogoutBoxLine />
                 </button>
 
-                <button
+                <Link
+                    to="/dashboard/settings"
                     className="user"
                     title="User settings"
                     aria-label="User settings button"
@@ -97,7 +100,7 @@ export const SideModal = () => {
                             <use href="/avatar.svg#male" />
                         </svg>
                     </span>
-                </button>
+                </Link>
             </header>
         </StyledSideModal>
     );
