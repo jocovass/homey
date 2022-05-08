@@ -7,13 +7,22 @@ import { catchAsync } from '../utils/catchAsync';
 import { deletePhoto } from '../services/cloudinary';
 import { sendInvitationEmail } from '../services/email';
 
+export const getCurrentUser = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        res.status(200).json({
+            data: {
+                user: req.user,
+            },
+        });
+    },
+);
+
 interface UpdateProfile {
     email?: string;
     firstName?: string;
     lastName: string;
     password?: string;
 }
-
 export const updateProfile = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const { email, firstName, lastName, password }: UpdateProfile =
@@ -73,14 +82,14 @@ export const updateProfileImage = catchAsync(
         user.avatar = file.filename;
         user.save();
 
-        if (prevAvatar) {
+        if (prevAvatar && !prevAvatar.startsWith('homey-avatar')) {
             // need to delete the old avatar so we don't have too many image in storage
             await deletePhoto(prevAvatar);
         }
 
         res.status(200).json({
             data: {
-                avatar: file,
+                user,
             },
         });
     },

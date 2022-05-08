@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import styled from '@emotion/styled';
 import {
     RiUserSettingsLine,
@@ -9,14 +9,17 @@ import {
     RiLogoutBoxLine,
 } from 'react-icons/ri';
 
+import { MyDetails } from '../../components/UserSettings/MyDetails';
+
 const StyledUserSettings = styled.div`
     padding: 1.5rem 5vw;
     margin: 3rem 0;
     display: grid;
-    grid-template-columns: minmax(22%, 200px);
+    grid-template-columns: minmax(min-content, 20%) 1fr;
 
     .side-col {
         grid-column: 1;
+        border-right: 1px solid ${props => props.theme.colors.grey};
 
         nav {
             margin: 1.5rem 0;
@@ -27,7 +30,7 @@ const StyledUserSettings = styled.div`
         }
 
         li {
-            margin-bottom: 0.7rem;
+            margin-bottom: 1.3rem;
             width: 100%;
         }
 
@@ -78,8 +81,9 @@ const StyledUserSettings = styled.div`
     }
 
     .content {
-        background-color: orangered;
+        /* background-color: orangered; */
         grid-column: 2;
+        padding-left: 3.5rem;
     }
 `;
 
@@ -119,7 +123,9 @@ export const UserSettings: React.FC = () => {
             </aside>
 
             <div className="content">
-                <h1>User Settings</h1>
+                <Routes>
+                    <Route index element={<MyDetails />} />
+                </Routes>
             </div>
         </StyledUserSettings>
     );

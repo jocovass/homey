@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import './index.scss';
 import App from './views/App';
 import { ThemeProvider } from '@emotion/react';
+import { UserProvider } from './context/userContext';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './styles/theme';
 
@@ -11,7 +12,9 @@ ReactDOM.render(
     <React.StrictMode>
         <Router>
             <ThemeProvider theme={theme}>
-                <App />
+                <UserProvider>
+                    <App />
+                </UserProvider>
             </ThemeProvider>
         </Router>
     </React.StrictMode>,

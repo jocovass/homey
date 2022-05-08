@@ -11,6 +11,7 @@ import {
 } from '../controllers/authControlles';
 import {
     acceptInvitation,
+    getCurrentUser,
     leaveHousehold,
     rejectInvitation,
     sendInvitation,
@@ -60,6 +61,7 @@ router.post(
 // isAuthenticated middleware
 router.use(authMiddelware);
 
+router.get('/current_user', getCurrentUser);
 router.post(
     '/send_invitation',
     simpleField(['householdName, householdId', 'email']),
@@ -84,13 +86,7 @@ router.post(
     validate,
     leaveHousehold,
 );
-router.post(
-    '/update_profile',
-    email(),
-    simpleField(['firstName', 'lastName']),
-    validate,
-    updateProfile,
-);
+router.post('/update_profile', updateProfile);
 router.post(
     '/update_profile_image',
     singlePhoto('users_profile', 'avatar'),

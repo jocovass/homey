@@ -16,7 +16,7 @@ export const PrimaryButton = styled.button<PrimaryButtonProps>`
     font-weight: 600;
     padding: 0.4em 1.3em;
 
-    ${hoverEffect}
+    ${hoverEffect('greenLight', 'greenAccent')}
 
     &:disabled {
         cursor: not-allowed;

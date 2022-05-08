@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from '../util/axios';
 
 /**
  * USER INVITATION MODEL
@@ -95,7 +96,7 @@ type UserProviderProps = { children: React.ReactNode };
 export function UserProvider({ children }: UserProviderProps) {
     const [state, dispatch] = React.useReducer(reducer, {
         user: null,
-        status: 'idle',
+        status: 'pending',
         error: null,
     });
     return (
@@ -114,3 +115,12 @@ export function useUser() {
 
     return context;
 }
+
+export const getCurrentUser = async (dispatch: Dispatch) => {
+    try {
+        const { data } = await axios.get('/users/current_user');
+        dispatch({ type: 'SET_USER', payload: { user: data.data.user } });
+    } catch (error: any) {
+        dispatch({ type: 'SET_USER', payload: { user: null } });
+    }
+};

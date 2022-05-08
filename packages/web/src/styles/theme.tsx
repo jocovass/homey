@@ -117,7 +117,8 @@ export const globalStyles = css`
     }
 `;
 
-export const hoverEffect = css`
+type Colours = keyof typeof theme.colors;
+export const hoverEffect = (innerColour: Colours, outerColour: Colours) => css`
     transition-property: box-shadow;
     transition-duration: 300ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -125,8 +126,8 @@ export const hoverEffect = css`
     &:hover,
     &:focus,
     &:focus-visible {
-        box-shadow: 0 0 0 0.1em ${theme.colors.greenLighter},
-            0 0 0 0.2em ${theme.colors.greenAccent};
+        box-shadow: 0 0 0 0.1em ${theme.colors[innerColour]},
+            0 0 0 0.2em ${theme.colors[outerColour]};
         outline: 0;
     }
 `;
