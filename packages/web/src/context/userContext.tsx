@@ -146,6 +146,35 @@ export const uploadProfilePicture = async ({
 
         return data.data.user;
     } catch (error: any) {
+        dispatch({
+            type: 'SET_ERROR',
+            payload: { error: 'Something went wrong.' },
+        });
+    }
+};
+
+export const updateProfile = async ({
+    firstName,
+    lastName,
+    email,
+    dispatch,
+}: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    dispatch: Dispatch;
+}) => {
+    try {
+        dispatch({ type: 'SET_STATUS', payload: { status: 'pending' } });
+
+        const { data } = await axios.post('/users/update_profile', {
+            firstName,
+            lastName,
+            email,
+        });
+
+        dispatch({ type: 'SET_USER', payload: { user: data.data.user } });
+    } catch (error: any) {
         console.log(error);
     }
 };
