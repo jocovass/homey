@@ -16,15 +16,6 @@ import { AuthForm } from '../styled/AuthForm';
 import { PrimaryButton } from '../styled/Buttons';
 import { BtnLoader } from '../styled/BtnLoader';
 
-// interface FormElements extends HTMLFormControlsCollection {
-//     email: HTMLInputElement;
-//     password: HTMLInputElement;
-// }
-
-// interface LoginFormElement extends HTMLFormElement {
-//     readonly elements: FormElements;
-// }
-
 type LoginFormFields = {
     email: string;
     password: string;

@@ -51,3 +51,23 @@ export const passwordValidationList = [
     'One special character',
     '8 characters minimum',
 ];
+
+// Validate fily type
+export function validateFileTypes(files?: FileList): boolean {
+    let valid = true;
+    if (files) {
+        Array.from(files).forEach(file => {
+            if (
+                ![
+                    'image/jpg',
+                    'image/jpeg',
+                    'image/png',
+                    'image/svg+xml',
+                ].includes(file.type)
+            ) {
+                valid = false;
+            }
+        });
+    }
+    return valid;
+}

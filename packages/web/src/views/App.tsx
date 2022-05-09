@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Global } from '@emotion/react';
 
 import { useUser, getCurrentUser } from '../context/userContext';
@@ -13,14 +13,18 @@ import { Dashboard } from './Dashboard/Dashboard';
 import { UserSettings } from './UserSettings/UserSettings';
 
 function App() {
-    const {
-        state: { user, status },
-        dispatch,
-    } = useUser();
+    const { dispatch } = useUser();
+    const navigat = useNavigate();
 
     React.useEffect(() => {
-        getCurrentUser(dispatch);
+        getCurrentUser(dispatch).then(() =>
+            navigat('/dashboard', { replace: true }),
+        );
     }, []);
+
+    // const isLoading = status === 'pending';
+
+    // if (isLoading) return <div>Loading bazz...</div>;
 
     return (
         <div className="">

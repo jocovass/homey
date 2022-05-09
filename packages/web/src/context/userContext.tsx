@@ -124,3 +124,28 @@ export const getCurrentUser = async (dispatch: Dispatch) => {
         dispatch({ type: 'SET_USER', payload: { user: null } });
     }
 };
+
+export const uploadProfilePicture = async ({
+    file,
+    dispatch,
+}: {
+    file: File;
+    dispatch: Dispatch;
+}) => {
+    dispatch({ type: 'SET_STATUS', payload: { status: 'pending' } });
+    try {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        const { data } = await axios.post(
+            '/users/update_profile_image',
+            formData,
+        );
+
+        dispatch({ type: 'SET_USER', payload: { user: data.data.user } });
+
+        return data.data.user;
+    } catch (error: any) {
+        console.log(error);
+    }
+};
