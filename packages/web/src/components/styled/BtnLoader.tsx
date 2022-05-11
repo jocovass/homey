@@ -69,6 +69,7 @@ const StyledBtnLoader = styled.div<StyledBtnLoaderProps>`
     &.small {
         width: 3rem;
         height: 0.6rem;
+        margin-left: 0.4em;
     }
 
     &.small {
@@ -166,17 +167,14 @@ const StyledBtnLoader = styled.div<StyledBtnLoaderProps>`
 `;
 
 type BtnLoaderProps = {
-    className: 'small' | 'medium' | 'large';
-} & StyledBtnLoaderProps;
-export const BtnLoader: React.FC<Partial<BtnLoaderProps>> = ({
-    loaderColour,
-    className,
+    className?: 'small' | 'medium' | 'large';
+} & Partial<StyledBtnLoaderProps>;
+export const BtnLoader: React.FC<BtnLoaderProps> = ({
+    loaderColour = 'greenLight',
+    className = 'small',
 }) => {
-    const bg = loaderColour || 'greenLight';
-    const cn = className || 'small';
-
     return (
-        <StyledBtnLoader loaderColour={bg} className={cn}>
+        <StyledBtnLoader loaderColour={loaderColour} className={className}>
             <div></div>
             <div></div>
             <div></div>

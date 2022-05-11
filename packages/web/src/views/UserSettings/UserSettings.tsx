@@ -10,6 +10,7 @@ import {
 } from 'react-icons/ri';
 
 import { MyDetails } from '../../components/UserSettings/MyDetails';
+import { UpdatePassword } from '../../components/UserSettings/UpdatePassword';
 
 const StyledUserSettings = styled.div`
     padding: 1.5rem 5vw;
@@ -125,6 +126,7 @@ export const UserSettings: React.FC = () => {
             <div className="content">
                 <Routes>
                     <Route index element={<MyDetails />} />
+                    <Route path="/password" element={<UpdatePassword />} />
                 </Routes>
             </div>
         </StyledUserSettings>

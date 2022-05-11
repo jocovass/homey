@@ -44,6 +44,13 @@ export const signupSchema = nameSchema
 
 export const loginSchema = emailSchame.concat(passSchemaOne);
 
+export const updatePasswordSchema = yup
+    .object({
+        currentPassword: yup.string().required('Current password is required.'),
+    })
+    .concat(passSchemaTwo)
+    .concat(passConfirmSchema);
+
 export const passwordValidationList = [
     'One lowercase character',
     'One uppercase character',

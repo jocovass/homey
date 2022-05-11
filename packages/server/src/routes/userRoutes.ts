@@ -94,8 +94,8 @@ router.post(
 );
 router.post(
     '/update_password',
-    password(['password', 'newPassword']),
-    comparePassword('newPassword', 'newPasswordConfirm'),
+    password(['currentPassword', 'newPassword']),
+    comparePassword('newPassword', 'passwordConfirm'),
     validate,
     updatePassword,
 );

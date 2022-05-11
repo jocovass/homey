@@ -8,7 +8,7 @@ export const simpleField = (fieldName: string | string[]) =>
         .trim()
         .not()
         .isEmpty()
-        .withMessage(`${fieldName} is required`)
+        .withMessage(`Field is required`)
         .escape();
 
 export const email = (fieldName = 'email') =>
@@ -16,7 +16,7 @@ export const email = (fieldName = 'email') =>
         .trim()
         .not()
         .isEmpty()
-        .withMessage(`${fieldName} is required.`)
+        .withMessage(`Field is required.`)
         .bail()
         .escape()
         .isEmail()
@@ -28,7 +28,7 @@ export const password = (fieldName: string | string[] = 'password') =>
         .trim()
         .not()
         .isEmpty()
-        .withMessage(`${fieldName} is required.`)
+        .withMessage(`Field is required.`)
         .escape();
 // .isStrongPassword()
 // .withMessage('Password is weak.'),

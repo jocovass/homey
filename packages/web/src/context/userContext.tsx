@@ -178,3 +178,29 @@ export const updateProfile = async ({
         console.log(error);
     }
 };
+
+export const updatePassword = async ({
+    currentPassword,
+    password,
+    passwordConfirm,
+    dispatch,
+}: {
+    currentPassword: string;
+    password: string;
+    passwordConfirm: string;
+    dispatch: Dispatch;
+}) => {
+    try {
+        dispatch({ type: 'SET_STATUS', payload: { status: 'pending' } });
+        const { data } = await axios.post('/users/update_password', {
+            currentPassword,
+            newPassword: password,
+            passwordConfirm,
+        });
+        dispatch({ type: 'SET_STATUS', payload: { status: 'success' } });
+        return data;
+    } catch (error: any) {
+        dispatch({ type: 'SET_STATUS', payload: { status: 'error' } });
+        return Promise.reject(error.response.data);
+    }
+};
