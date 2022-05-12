@@ -8,7 +8,6 @@ import { SideModal } from '../components/SideModal/SideModal';
 
 const StyledDashboard = styled.div`
     margin-right: clamp(0px, 30vw, 450px);
-    height: 1000px;
 `;
 
 export const DashboardLayout: React.FC = ({ children }) => {

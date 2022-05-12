@@ -11,6 +11,7 @@ import {
 
 import { MyDetails } from '../../components/UserSettings/MyDetails';
 import { UpdatePassword } from '../../components/UserSettings/UpdatePassword';
+import { Members } from '../../components/UserSettings/Members';
 
 const StyledUserSettings = styled.div`
     padding: 1.5rem 5vw;
@@ -127,6 +128,7 @@ export const UserSettings: React.FC = () => {
                 <Routes>
                     <Route index element={<MyDetails />} />
                     <Route path="/password" element={<UpdatePassword />} />
+                    <Route path="/members" element={<Members />} />
                 </Routes>
             </div>
         </StyledUserSettings>
