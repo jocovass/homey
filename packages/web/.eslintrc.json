@@ -49,6 +49,7 @@
         "no-underscore-dangle": "off",
         "comma-dangle": "off",
         "class-methods-use-this": "off",
+        "import/no-named-as-default": 0,
         "prefer-destructuring": [
             "error",
             {

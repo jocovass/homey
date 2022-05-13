@@ -1,7 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { RiLogoutBoxLine } from 'react-icons/ri';
+import {
+    RiLogoutBoxLine,
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
+} from 'react-icons/ri';
+import Calendar from 'react-calendar';
+
+import './Calendar.scss';
 
 const StyledSideModal = styled.aside`
     background-color: #fff;
@@ -18,6 +25,7 @@ const StyledSideModal = styled.aside`
         align-items: center;
         justify-content: space-between;
         padding-bottom: 0.8rem;
+        margin-bottom: 2rem;
         border-bottom: ${props => `1px solid ${props.theme.colors.greyLight}`};
     }
 
@@ -102,6 +110,17 @@ export const SideModal = () => {
                     </span>
                 </Link>
             </header>
+
+            <Calendar
+                value={new Date()}
+                prevLabel={<RiArrowLeftSLine />}
+                nextLabel={<RiArrowRightSLine />}
+                tileContent={({ date, view }) =>
+                    view === 'month' && date.getDay() === 0 ? (
+                        <span className="meal"></span>
+                    ) : null
+                }
+            />
         </StyledSideModal>
     );
 };

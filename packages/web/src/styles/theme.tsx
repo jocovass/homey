@@ -12,8 +12,8 @@ export const theme = {
         orange: '#FB9119',
         orangeRed: '#C05E3D',
         blue: '#6398DE',
-        black: '#040404',
-        grey: '#777777',
+        black: '#333333',
+        grey: '#999999',
         greyLight: '#efefef',
     },
     fontFamily: {
@@ -39,17 +39,23 @@ export const globalStyles = css`
     }
     html {
         font-size: 62.5%; // set the root fontsize to 10px
-        --clr-greenLighter: ${theme.colors.greenLighter};
-        --clr-greenLight: ${theme.colors.greenLight};
-        --clr-greenAccent: ${theme.colors.greenAccent};
-        --clr-greenGrey: ${theme.colors.greenGrey};
-        --clr-greenDark: ${theme.colors.greenDark};
-        --clr-greenBlack: ${theme.colors.greenBlack};
+        --clr-green-lighter: ${theme.colors.greenLighter};
+        --clr-green-light: ${theme.colors.greenLight};
+        --clr-green-accent: ${theme.colors.greenAccent};
+        --clr-green-grey: ${theme.colors.greenGrey};
+        --clr-green-dark: ${theme.colors.greenDark};
+        --clr-green-black: ${theme.colors.greenBlack};
+        --clr-yellow: ${theme.colors.yellow};
         --clr-orange: ${theme.colors.orange};
-        --clr-orangeRed: ${theme.colors.orangeRed};
+        --clr-orange-red: ${theme.colors.orangeRed};
         --clr-blue: ${theme.colors.blue};
+        --clr-black: ${theme.colors.black};
+        --clr-grey: ${theme.colors.grey};
+        --clr-grey-light: ${theme.colors.greyLight};
         // @media ${theme.mq.laptop} {
-        //     font-size: 56.25%;
+        //     font-size: 56.25%; black: '#040404',
+        /* grey: '#777777',
+        greyLight: '#efefef', */
         // }
         // @media ${theme.mq['tablet-land']} {
         //     font-size: 50%;

@@ -1,0 +1,148 @@
+@import 'react-calendar/dist/Calendar.css';
+
+.react-calendar {
+    width: 100%;
+    border: 0;
+}
+
+// Calendar navigation, buttons
+.react-calendar__navigation {
+    height: auto;
+    padding: 0.5rem 1rem;
+}
+
+.react-calendar__navigation__prev2-button,
+.react-calendar__navigation__next2-button {
+    display: none;
+}
+
+button.react-calendar__navigation__label {
+    order: 0;
+    text-align: left;
+    height: auto;
+    margin-right: 3rem;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--clr-black);
+    transition-property: background-color;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        background-color: var(--clr-green-light);
+    }
+}
+
+button.react-calendar__navigation__prev-button,
+button.react-calendar__navigation__next-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: 1;
+    min-width: auto;
+    height: 3.3rem;
+    width: 3.3rem;
+    border-radius: 50%;
+    font-size: 2.65rem;
+    color: var(--clr-black);
+    transition-property: background-color;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        background-color: var(--clr-green-light);
+    }
+}
+
+button.react-calendar__navigation__prev-button {
+    margin-right: 0.8rem;
+}
+
+// Calendar months
+.react-calendar__month-view__weekdays {
+    color: var(--clr-grey);
+    font-size: 1.45rem;
+    font-weight: 400;
+    text-transform: capitalize;
+    border: 0;
+
+    abbr[title] {
+        text-decoration: none;
+    }
+}
+
+// Calendar days
+button.react-calendar__month-view__days__day {
+    padding: 1.7rem;
+    position: relative;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--clr-black);
+    z-index: 1;
+
+    &.react-calendar__tile--now {
+        background-color: transparent;
+    }
+
+    &.react-calendar__month-view__days__day--neighboringMonth {
+        font-size: 1.2rem;
+        color: rgba(#000, 0.2);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        background-color: transparent;
+        z-index: -1;
+        pointer-events: none;
+        transition-property: background-color;
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:enabled:hover {
+        background-color: transparent;
+    }
+
+    &:enabled:hover::after {
+        background-color: var(--clr-green-light);
+    }
+
+    &.react-calendar__tile--now {
+        color: #fff;
+
+        &::after,
+        &:enabled:hover::after {
+            background-color: var(--clr-yellow);
+        }
+    }
+
+    &.react-calendar__tile--rangeStart,
+    &.react-calendar__tile--rangeEnd {
+        color: #fff;
+
+        &::after,
+        &:enabled:hover::after {
+            background-color: var(--clr-green-dark);
+        }
+    }
+
+    // Meal planner indicator dot on calendar
+    .meal {
+        position: absolute;
+        pointer-events: none;
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 50%;
+        bottom: 3px;
+        left: 50%;
+        transform: translate(-50%);
+        background-color: var(--clr-orange-red);
+    }
+}
