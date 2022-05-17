@@ -86,6 +86,12 @@ export const globalStyles = css`
         margin-bottom: 0.6rem;
     }
 
+    h2 {
+        font-size: 2rem;
+        font-weight: 500;
+        margin-bottom: 0.6rem;
+    }
+
     h3 {
         font-size: 1.5rem;
         font-weight: 500;
