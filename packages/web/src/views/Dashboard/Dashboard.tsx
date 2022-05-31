@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { rgba } from 'emotion-rgba';
-import { RiArrowRightUpLine } from 'react-icons/ri';
+import { RiArrowRightUpLine, RiGroupLine } from 'react-icons/ri';
 
 import pizza from '../../images/pizza.jpeg';
 import burrito from '../../images/burrito.jpeg';
@@ -12,117 +12,212 @@ const StyledDashboard = styled.div`
     padding: 1.5rem 5vw;
     margin: 3rem 0;
 
-    .gird {
-        margin: 3rem 0;
-        display: grid;
-        grid-template-columns: repeat(2, 130px) 1fr 1fr;
-        grid-template-rows: minmax(50px, 100px) 1fr;
-        grid-gap: 20px;
+    .recipes-overview {
+        margin-bottom: 5rem;
 
-        > * {
-            border-radius: 15px;
-        }
-    }
+        .grid {
+            margin: 3rem 0;
+            display: grid;
+            grid-template-columns: repeat(2, 130px) 1fr 1fr;
+            grid-template-rows: minmax(50px, 100px) 1fr;
+            grid-gap: 20px;
 
-    .recipes-count {
-        grid-column: 1 / 2;
-        grid-row: 1 / 2;
-        background-color: ${props => props.theme.colors.yellow};
-        color: ${props => props.theme.colors.black};
-        font-size: 1.4rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        strong {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-    }
-
-    .meal-planner {
-        grid-column: 1 / 3;
-        grid-row: 2 / 3;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        position: relative;
-        background-color: #fff;
-        color: ${props => props.theme.colors.grey};
-        font-size: 1.2rem;
-        padding: 2rem;
-        z-index: 1;
-
-        p {
-            margin-bottom: 0.5rem;
+            > * {
+                border-radius: 15px;
+            }
         }
 
-        strong {
-            display: block;
+        .recipes-count {
+            grid-column: 1 / 3;
+            grid-row: 1 / 2;
+            background-color: ${props => props.theme.colors.yellow};
             color: ${props => props.theme.colors.black};
             font-size: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            strong {
+                font-size: 2.5rem;
+                font-weight: 600;
+                margin-top: 0.5rem;
+            }
         }
 
-        .edit-meal {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 0.2em 0.6em;
-            border: 1px solid ${props => props.theme.colors.yellow};
-            border-radius: 20px;
-            color: ${props => props.theme.colors.yellow};
-            background-color: ${props => rgba(props.theme.colors.yellow, 0.2)};
+        .meal-planner {
+            grid-column: 1 / 3;
+            grid-row: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background-color: #fff;
+            color: ${props => props.theme.colors.grey};
+            font-size: 1.2rem;
+            padding: 2rem;
+            overflow: hidden;
+            z-index: 1;
+
+            p {
+                margin-bottom: 0.5rem;
+            }
+
+            strong {
+                display: block;
+                color: ${props => props.theme.colors.black};
+                font-size: 1.4rem;
+            }
+
+            .edit-meal {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                padding: 0.2em 0.6em;
+                border: 1px solid ${props => props.theme.colors.yellow};
+                border-radius: 20px;
+                color: ${props => props.theme.colors.yellow};
+                background-color: ${props =>
+                    rgba(props.theme.colors.yellow, 0.2)};
+            }
+
+            img {
+                position: absolute;
+                width: 16rem;
+                top: 50%;
+                right: 35px;
+                transform: rotate(16deg) translateY(-65%);
+                filter: opacity(0.35);
+                z-index: -1;
+            }
         }
 
-        img {
-            position: absolute;
-            width: 13rem;
-            top: 50%;
-            right: 35px;
-            transform: rotate(26deg) translateY(-65%);
-            z-index: -1;
+        .recipe-one,
+        .recipe-two {
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+
+            figcaption {
+                position: absolute;
+                border-radius: 15px;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: ${props =>
+                    rgba(props.theme.colors.black, 0.6)};
+                color: #fff;
+                display: flex;
+                padding: 2rem;
+                align-items: flex-end;
+                justify-content: space-between;
+                transition-property: background-color;
+                transition-duration: 300ms;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+                h3 {
+                    color: #fff;
+                }
+
+                p {
+                    font-size: 1.15rem;
+                }
+
+                a {
+                    display: inline-block;
+                    color: #fff;
+                    background-color: ${props => props.theme.colors.yellow};
+                    height: 3rem;
+                    width: 3rem;
+                    font-size: 2rem;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition-property: box-shadow;
+                    transition-duration: 300ms;
+                    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+                    &:hover,
+                    &:focus,
+                    &:focus-visible {
+                        box-shadow: 0 0 0 0.1em
+                                ${props => props.theme.colors.black},
+                            0 0 0 0.2em ${props => props.theme.colors.yellow};
+                        outline: 0;
+                    }
+                }
+
+                &:hover {
+                    background-color: ${props =>
+                        rgba(props.theme.colors.black, 0.8)};
+                }
+            }
+
+            img {
+                width: 100%;
+                display: block;
+            }
+        }
+
+        .recipe-one {
+            grid-column: 3 / 4;
+            grid-row: 1 / 3;
+        }
+
+        .recipe-two {
+            grid-column: 4 / 5;
+            grid-row: 1 / 3;
         }
     }
 
-    .recipe-one,
-    .recipe-two {
-        border-radius: 15px;
-        position: relative;
-        overflow: hidden;
+    .shoppinglist-overview {
+        .grid {
+            margin: 3rem 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
 
-        figcaption {
-            position: absolute;
-            border-radius: 15px;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: ${props =>
-                rgba(props.theme.colors.greenDark, 0.6)};
-            color: #fff;
-            display: flex;
+            > * {
+                border-radius: 15px;
+            }
+        }
+
+        .shoppinglist {
+            background-color: #fff;
             padding: 2rem;
-            align-items: flex-end;
-            justify-content: space-between;
-            transition-property: background-color;
-            transition-duration: 300ms;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
 
-            h3 {
-                color: #fff;
-                font-size: 1.75rem;
+            .author,
+            .item-count {
+                color: ${props => props.theme.colors.grey};
+                font-size: 1.3rem;
             }
 
-            p {
-                font-size: 1.15rem;
+            .author {
+                display: flex;
+                align-items: center;
+
+                svg {
+                    color: ${props => props.theme.colors.greenDark};
+                    margin-right: 0.6rem;
+                    font-size: 1.6rem;
+                }
+            }
+
+            h3 {
+                color: ${props => props.theme.colors.black};
+                margin: 3rem 0 2rem;
             }
 
             a {
+                position: absolute;
+                bottom: 15px;
+                right: 15px;
                 display: inline-block;
                 color: #fff;
-                background-color: ${props => props.theme.colors.yellow};
+                background-color: ${props => props.theme.colors.greenDark};
                 height: 3rem;
                 width: 3rem;
                 font-size: 2rem;
@@ -137,33 +232,12 @@ const StyledDashboard = styled.div`
                 &:hover,
                 &:focus,
                 &:focus-visible {
-                    box-shadow: 0 0 0 0.1em
-                            ${props => props.theme.colors.greenDark},
-                        0 0 0 0.2em ${props => props.theme.colors.yellow};
+                    box-shadow: 0 0 0 0.1em #fff,
+                        0 0 0 0.2em ${props => props.theme.colors.greenDark};
                     outline: 0;
                 }
             }
-
-            &:hover {
-                background-color: ${props =>
-                    rgba(props.theme.colors.greenDark, 0.8)};
-            }
         }
-
-        img {
-            width: 100%;
-            display: block;
-        }
-    }
-
-    .recipe-one {
-        grid-column: 3 / 4;
-        grid-row: 1 / 3;
-    }
-
-    .recipe-two {
-        grid-column: 4 / 5;
-        grid-row: 1 / 3;
     }
 `;
 
@@ -173,9 +247,9 @@ export const Dashboard: React.FC = () => {
             <div className="recipes-overview">
                 <h2>Recipes</h2>
 
-                <div className="gird">
+                <div className="grid">
                     <div className="recipes-count">
-                        <span>Total Recipes</span>
+                        <p>Total Recipes</p>
                         <strong>10</strong>
                     </div>
                     <div className="meal-planner">
@@ -227,6 +301,43 @@ export const Dashboard: React.FC = () => {
                             </Link>
                         </figcaption>
                     </figure>
+                </div>
+            </div>
+
+            <div className="shoppinglist-overview">
+                <h2>Shopping Lists</h2>
+
+                <div className="grid">
+                    {/* <div className="shoppinglist-count">
+                        <p>Total</p>
+                        <strong>10</strong>
+                    </div> */}
+
+                    <div className="shoppinglist">
+                        <p className="item-count">5 items</p>
+                        <h3>Groceries</h3>
+                        <p className="author">
+                            <RiGroupLine />
+                            <span>Nora Sorban</span>
+                            <span>, Joco Vass</span>
+                        </p>
+                        <Link to="/dashboard" aria-label="Go to Tomato Pizza">
+                            <RiArrowRightUpLine />
+                        </Link>
+                    </div>
+
+                    <div className="shoppinglist">
+                        <p className="item-count">15 items</p>
+                        <h3>Weekend shopping list</h3>
+                        <p className="author">
+                            <RiGroupLine />
+                            <span>Nora Sorban</span>
+                            <span>, Joco Vass</span>
+                        </p>
+                        <Link to="/dashboard" aria-label="Go to Tomato Pizza">
+                            <RiArrowRightUpLine />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </StyledDashboard>
