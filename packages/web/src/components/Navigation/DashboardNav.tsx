@@ -40,9 +40,9 @@ export const DashboardNav: React.FC = () => {
                 <li>
                     <NavLink
                         className={({ isActive }) => (isActive ? 'active' : '')}
-                        to="/shoppinglist"
+                        to="/dashboard/shoppinglists"
                     >
-                        Shoppinglist
+                        Shopping Lists
                     </NavLink>
                 </li>
             </ul>

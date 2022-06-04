@@ -8,6 +8,11 @@ import { SideModal } from '../components/SideModal/SideModal';
 
 const StyledDashboard = styled.div`
     margin-right: clamp(0px, 30vw, 450px);
+
+    .content {
+        padding: 1.5rem 5vw;
+        margin: 3rem 0;
+    }
 `;
 
 export const DashboardLayout: React.FC = ({ children }) => {
@@ -17,7 +22,7 @@ export const DashboardLayout: React.FC = ({ children }) => {
                 <DashboardNav />
             </Header>
             <SideModal />
-            {children ? children : <Outlet />}
+            <div className="content">{children ? children : <Outlet />}</div>
         </StyledDashboard>
     );
 };

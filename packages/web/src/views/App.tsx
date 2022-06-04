@@ -11,6 +11,8 @@ import { DashboardLayout } from '../layout/Dashboard';
 import { Homepage } from './Homepage/Homepage';
 import { Dashboard } from './Dashboard/Dashboard';
 import { UserSettings } from './UserSettings/UserSettings';
+import { ShoppingLists } from './ShoppingLists/ShoppingLists';
+import { ShoppingList } from './ShoppingList/ShoppingList';
 
 function App() {
     const { dispatch } = useUser();
@@ -38,6 +40,11 @@ function App() {
                 <Route path="dashboard" element={<DashboardLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="settings/*" element={<UserSettings />} />
+                    <Route path="shoppinglists" element={<ShoppingLists />} />
+                    <Route
+                        path="shoppinglists/some-id"
+                        element={<ShoppingList />}
+                    />
                 </Route>
             </Routes>
         </div>
