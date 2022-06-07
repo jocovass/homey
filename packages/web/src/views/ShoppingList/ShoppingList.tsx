@@ -1,8 +1,15 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { RiDeleteBin6Line, RiAddCircleLine, RiGroupLine } from 'react-icons/ri';
+import {
+    RiDeleteBin6Line,
+    RiAddCircleLine,
+    RiGroupLine,
+    RiBookMarkLine,
+} from 'react-icons/ri';
 
 import { ListItem } from './ListItem';
+import { NewListItem } from './NewListItem';
+import { ShoppingListItem, ShoppingListItems } from './ShoppingListTypes.d';
 
 const StyledShoppingList = styled.div`
     .content {
@@ -15,7 +22,7 @@ const StyledShoppingList = styled.div`
         .headline {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
 
             .completed-items {
                 color: ${props => props.theme.colors.grey};
@@ -23,15 +30,10 @@ const StyledShoppingList = styled.div`
                 margin-left: 1rem;
             }
 
-            .author {
-                display: flex;
-                align-items: center;
-
-                svg {
-                    color: ${props => props.theme.colors.greenDark};
-                    margin-right: 0.6rem;
-                    font-size: 1.25rem;
-                }
+            .created {
+                font-size: 1.15rem;
+                margin-top: 0.45rem;
+                color: ${props => props.theme.colors.grey};
             }
 
             .nav button {
@@ -41,13 +43,13 @@ const StyledShoppingList = styled.div`
                 transition-duration: 300ms;
                 transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
-                &:first-of-type {
+                &:not(:last-of-type) {
                     margin-right: 0.5rem;
                 }
 
                 svg {
-                    height: 1.9rem;
-                    width: 1.9rem;
+                    height: 2rem;
+                    width: 2rem;
                 }
 
                 &:hover {
@@ -57,15 +59,6 @@ const StyledShoppingList = styled.div`
         }
     }
 `;
-
-type ShoppingListItem = {
-    label: string;
-    amount: number;
-    unit: string;
-    status?: 'pending' | 'done';
-    id: number;
-};
-type ShoppingListItems = ShoppingListItem[] | null;
 
 const fakeItems: ShoppingListItems = [
     {
@@ -107,11 +100,21 @@ const fakeItems: ShoppingListItems = [
 
 export const ShoppingList = () => {
     const [items, setItems] = React.useState<ShoppingListItems>(fakeItems);
+    const [newItem, setNewItem] = React.useState<boolean>(false);
+
+    const toggleNewItem = () => setNewItem(false);
 
     const updateItems = (items: ShoppingListItems) => {
         // TODO:  Post items to the server
         prompt('Ready to upload your changes?');
         setItems(items);
+    };
+
+    const addNewItem = (item: ShoppingListItem) => {
+        if (!items) return;
+        const updatedItems = [item, ...items];
+        updateItems(updatedItems);
+        toggleNewItem();
     };
 
     const updateItem = (item: ShoppingListItem) => {
@@ -151,6 +154,15 @@ export const ShoppingList = () => {
         updateItems(updatedItems);
     };
 
+    const itemsTotalCount = items?.length;
+    const itemsDoneCount = items?.reduce((acc, item) => {
+        if (item.status === 'done') {
+            acc += 1;
+        }
+
+        return acc;
+    }, 0);
+
     return (
         <StyledShoppingList>
             <h1>Shopping List</h1>
@@ -160,18 +172,23 @@ export const ShoppingList = () => {
                     <div>
                         <h3>
                             Groceries{' '}
-                            <span className="completed-items">2/10</span>
+                            <span className="completed-items">
+                                {itemsDoneCount}/{itemsTotalCount}
+                            </span>
                         </h3>
-                        <p className="author">
-                            <RiGroupLine />
-                            <span>Nora Sorban</span>
-                            <span>, Joco Vass</span>
-                        </p>
+                        <p className="created">Created: 07.06.2022</p>
                     </div>
 
                     <div className="nav">
-                        <button title="Add recipe to shopping list">
+                        <button
+                            title="Add new item to shopping list"
+                            onClick={() => setNewItem(true)}
+                        >
                             <RiAddCircleLine />
+                        </button>
+
+                        <button title="Add recipe to shopping list">
+                            <RiBookMarkLine />
                         </button>
 
                         <button title="Delete shopping list">
@@ -181,6 +198,12 @@ export const ShoppingList = () => {
                 </div>
 
                 <ul className="list">
+                    {newItem && (
+                        <NewListItem
+                            toggleNewItem={toggleNewItem}
+                            updateItem={addNewItem}
+                        />
+                    )}
                     {items &&
                         items.map(item => (
                             <ListItem

@@ -4,6 +4,11 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import {
+    ShoppingListItem,
+    ShoppingListFormFields,
+} from './ShoppingListTypes.d';
+
 const StyledListItemForm = styled.form`
     display: flex;
     flex-direction: column;
@@ -31,7 +36,7 @@ const StyledListItemForm = styled.form`
             cursor: pointer;
             display: flex;
             align-items: center;
-            padding: 0.3em 0.5em;
+            padding: 0.35em 0.75em;
             margin-top: 0.5rem;
             border-radius: 50px;
             font-size: 1.4rem;
@@ -79,24 +84,11 @@ const StyledListItemForm = styled.form`
     }
 `;
 
-type ShoppingListItem = {
-    label: string;
-    amount: number;
-    unit: string;
-    status?: 'pending' | 'done';
-    id: number;
-};
-
 type ListItemProps = {
-    item: ShoppingListItem;
-    updateItem: (item: ShoppingListItem) => void;
-    setEditing: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-type ListItemFormFields = {
-    label: string;
-    amount: number;
-    unit: string;
+    submitButtonLabel?: string;
+    item?: ShoppingListItem;
+    submitHandler: (data: ShoppingListFormFields) => void;
+    cancel: () => void;
 };
 
 const schema = yup.object({
@@ -107,33 +99,24 @@ const schema = yup.object({
 
 export const ListItemForm: React.FC<ListItemProps> = ({
     item,
-    updateItem,
-    setEditing,
+    submitHandler,
+    cancel,
+    submitButtonLabel = 'Save',
 }) => {
     const {
         register,
         handleSubmit,
         formState: { errors, touchedFields },
-    } = useForm<ListItemFormFields>({
+    } = useForm<ShoppingListFormFields>({
         defaultValues: {
-            label: item.label,
-            amount: item.amount,
-            unit: item.unit,
+            label: item?.label,
+            amount: item?.amount,
+            unit: item?.unit,
         },
         resolver: yupResolver(schema),
         mode: 'all',
         criteriaMode: 'all',
     });
-    const submitHandler = (data: ListItemFormFields) => {
-        updateItem({
-            ...item,
-            label: data.label,
-            amount: data.amount,
-            unit: data.unit,
-        });
-
-        setEditing(prev => !prev);
-    };
 
     return (
         <StyledListItemForm onSubmit={handleSubmit(submitHandler)}>
@@ -141,7 +124,7 @@ export const ListItemForm: React.FC<ListItemProps> = ({
                 className={touchedFields.label && errors.label ? 'error' : ''}
                 type="text"
                 id="label"
-                defaultValue={item.label}
+                defaultValue={item?.label}
                 placeholder="ex. Egss"
                 {...register('label')}
             />
@@ -149,7 +132,7 @@ export const ListItemForm: React.FC<ListItemProps> = ({
                 className={touchedFields.amount && errors.amount ? 'error' : ''}
                 type="number"
                 id="amount"
-                defaultValue={item.amount}
+                defaultValue={item?.amount}
                 placeholder="ex. 1"
                 {...register('amount')}
             />
@@ -157,17 +140,17 @@ export const ListItemForm: React.FC<ListItemProps> = ({
                 className={touchedFields.unit && errors.unit ? 'error' : ''}
                 type="text"
                 id="unit"
-                defaultValue={item.unit}
+                defaultValue={item?.unit}
                 placeholder="ex. pack"
                 {...register('unit')}
             />
 
             <div className="form-btns">
-                <button className="save">Save</button>
+                <button className="save">{submitButtonLabel}</button>
                 <button
                     className="cancel"
                     type="button"
-                    onClick={() => setEditing(prev => !prev)}
+                    onClick={() => cancel()}
                 >
                     Cancel
                 </button>

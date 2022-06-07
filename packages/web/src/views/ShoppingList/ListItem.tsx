@@ -4,6 +4,10 @@ import { rgba } from 'emotion-rgba';
 import { RiPencilLine, RiDeleteBin6Line } from 'react-icons/ri';
 
 import { ListItemForm } from './ListItemForm';
+import {
+    ShoppingListItem,
+    ShoppingListFormFields,
+} from './ShoppingListTypes.d';
 
 const StyledListItem = styled.li`
     list-style-type: none;
@@ -73,14 +77,6 @@ const StyledListItem = styled.li`
     }
 `;
 
-type ShoppingListItem = {
-    label: string;
-    amount: number;
-    unit: string;
-    status?: 'pending' | 'done';
-    id: number;
-};
-
 type ListItemProps = {
     item: ShoppingListItem;
     toggleHandler: (itemId: number) => void;
@@ -95,6 +91,19 @@ export const ListItem: React.FC<ListItemProps> = ({
     removeHandler,
 }) => {
     const [editing, setEditing] = React.useState(false);
+
+    const submitHandler = (data: ShoppingListFormFields) => {
+        updateItem({
+            ...item,
+            label: data.label,
+            amount: data.amount,
+            unit: data.unit,
+        });
+
+        setEditing(prev => !prev);
+    };
+
+    const cancel = () => setEditing(prev => !prev);
 
     return (
         <StyledListItem key={item.id} className={`list__item ${item.status}`}>
@@ -130,8 +139,8 @@ export const ListItem: React.FC<ListItemProps> = ({
             ) : (
                 <ListItemForm
                     item={item}
-                    setEditing={setEditing}
-                    updateItem={updateItem}
+                    cancel={cancel}
+                    submitHandler={submitHandler}
                 />
             )}
         </StyledListItem>
